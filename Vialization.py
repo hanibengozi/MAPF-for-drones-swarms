@@ -107,12 +107,15 @@ class Visualize:
 
     def get_currentStep(self):
         current_steps = []
+        goal_steps = {}
         for agent in self.agents_path:
             if len(self.agents_path[agent]) > self.i:
                 current_steps.append(self.agents_path[agent][self.i])
             else:
                 current_steps.append(None)
-        return current_steps
+                goal_steps[agent] = self.agents_path[agent][-1]
+
+        return current_steps, goal_steps
 
     def get_prevStep(self):
         prev_steps = []
@@ -126,15 +129,15 @@ class Visualize:
 
     #draw  one step, for all agents
     def draw_one_step(self):
-        if self.i == -1 or self.i > self.num_steps -1:   #for the first time, when load the world, and when thw steps finish
+        if self.i == -1 or self.i > self.num_steps:   #for the first time, when load the world, and when thw steps finish
             self.i += 1
             return
 
-        current_steps = self.get_currentStep()
+        current_steps, goal_steps = self.get_currentStep()
         prev_steps = self.get_prevStep()
         self.frame.canvas.delete("all")
         self.draw_world()
-        self.draw_agents(current_steps, prev_steps)
+        self.draw_agents(current_steps, prev_steps, goal_steps)
         self.frame.pack(fill=BOTH, expand=1)
         self.i += 1
 
@@ -170,7 +173,7 @@ class Visualize:
         self.frame.canvas.itemconfig(self.vis_cells[x][y][z])
 
     #the function get position of agent and draw them. if type==1 this is current steps else is preve steps
-    def draw_agents(self, current_steps, preve_steps):
+    def draw_agents(self, current_steps, preve_steps, goal_steps):
         colors_current = ['purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange']
         colors_prev = ['#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280']
 
@@ -183,4 +186,9 @@ class Visualize:
                 if step:
                     x,y,z = step
                     self.draw_agent(x,y,z,colors_prev[i])
+        if goal_steps:
+            for agent in goal_steps:
+                if goal_steps[agent]:
+                    x,y,z = goal_steps[agent]
+                    self.draw_agent(x,y,z,colors_current[agent - 1])
 

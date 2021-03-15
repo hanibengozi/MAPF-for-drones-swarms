@@ -1,60 +1,7 @@
 from pip._vendor.msgpack.fallback import xrange
 
-def try_pathfinding(agents, world, vialization = None):
 
-    #----------------------------initialization------------------------------------------------
-    deleted_agents_list = []              # copy of agents list, So that it can be deleted later
-    current_steps = []
-    prev_steps = []
-    paths = {}
-    conflict_steps = []
-    agents_current_steps = {}             # optional for visualization
-    agent_prev_steps = {}
-    i = 0
-
-    for agent in agents:                               # initialize the list of current_steps with start pos
-        current_steps.append(world.starts_pos[agent])  # add start pos, for each agent
-        paths[agent] = []                              # initialize the value of paths dict to empty list
-
-
-    #----------------------------- stay in loop, until we find path for evrey agent ------------------
-    while len(deleted_agents_list) < len(agents):
-        # optinal for vialization, intialize the dicts
-        agents_current_steps[i] = {}
-        agent_prev_steps[i] = {}
-        prev_steps = current_steps.copy()
-        for agent in agents:                                          # iterate over the agents list.
-            goal = world.goals_pos[agent]                             # goal pos, of this agent
-
-            if agent in deleted_agents_list:                          # in case we already find path for this agent
-                current_steps[agent - 1] = goal
-                agents_current_steps[i][agent] = [goal,goal]
-                continue
-
-            current_step = current_steps[agent - 1]                   # get the current step
-            agents_current_steps[i][agent] = current_step  # update the dict of the steps
-            if i:
-                prev_step = prev_steps[agent - 1]
-                agent_prev_steps[i][agent] = prev_step
-            paths[agent].append(current_step)                         # update the path for this agent
-
-            if current_step != goal:                                  # in case we didnt arrived to the goal pos, keep loking for the next step
-                current_step = getNextStep(current_step, goal)        # find the next step
-            else:                                                     # in case we arrived to the goal
-                deleted_agents_list.append(agent)                     # add this agent to deleted agents list
-
-            if checkConflict(current_step, current_steps, prev_steps):# Check if this step conflicts with other steps
-                conflict_steps.append(current_step)
-
-            current_steps[agent - 1] = current_step                   # update the current step list
-
-        print("current_steps\n", current_steps, "\nprev_steps\n", prev_steps)
-        i += 1
-
-    if vialization:
-        return agents_current_steps, agent_prev_steps, conflict_steps
-
-
+# this method get agent and the world, and return path for each agent without collision
 def find_path(agents, world):
 
     # ----------------------------initialization------------------------------------------------
@@ -73,7 +20,8 @@ def find_path(agents, world):
     while agents_list:
 
         conflict_steps[i] = []
-        prev_steps = current_steps.copy()                             # update the prev steps list, to the last current steps
+        prev_steps = current_steps.copy()                             # update the prev steps list, to the last current steps list
+
         for agent_index in xrange(len(agents_list) - 1, -1, -1):      # iterate over the list of agent left.
             agent = agents_list[agent_index]                          # get the agent
             goal = world.goals_pos[agent]                             # goal pos, of this agent
@@ -82,22 +30,18 @@ def find_path(agents, world):
 
             paths[agent].append(current_step)                         # update the path for this agent
 
-            if current_step != goal:                                  # in case we didnt arrived to the goal pos, keep loking for the next step
-                current_step = getNextStep(current_step, goal)        # find the next step
-                if checkConflict(current_step, current_steps,
-                                 prev_steps):  # Check if this step conflicts with other steps
+            if current_step != goal:                                       # in case we didnt arrived to the goal pos, keep loking for the next step
+                current_step = getNextStep(current_step, goal)             # find the next step
+
+                if checkConflict(current_step, current_steps,prev_steps):  # Check if this step conflicts with other steps
                     conflict_steps[i].append(current_step)
 
-                current_steps[agent - 1] = current_step  # update the current steps list
-            else:                                                     # in case we arrived to the goal
-                del agents_list[agent_index]                          # remove this agent from list
+                current_steps[agent - 1] = current_step                    # update the current steps list
+            else:                                                          # in case we arrived to the goal
+                del agents_list[agent_index]                               # remove this agent from list
 
-
-
-        #Advances the steps in one
         print("current\n", current_steps, "\nprev\n", prev_steps)
-        i += 1
-
+        i += 1                                                             #Advances the steps in one
     print("the paths:\n", paths)
     return paths, conflict_steps
 
