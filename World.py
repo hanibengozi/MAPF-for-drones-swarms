@@ -1,4 +1,5 @@
 import numpy as np
+from agent import *
 
 class World:
     def __init__(self, height, width, length):
@@ -6,25 +7,21 @@ class World:
         self.width = width
         self.length = length
         self.num_floors = 3
-        self.num_rows = 10  #length
-        self.num_cols = 10  #width
-        self.starts_pos = {}
-        self.goals_pos = {}
-        self.agents = []
-        self.num_agents = 0
+        self.num_rows = 10                                  # length
+        self.num_cols = 10                                  # width
+        self.agents = []                                    # list of agent object
         #self.floors = dict()
         #self.cells = np.zeros((length, width), dtype=int)
 
     #the functuon get list of agents position(start & end), end add them to world
     def add_agents(self,agents_pos):
+
+        self.agents = agents_pos
         if agents_pos:
-            for (start_x,start_y, start_z, goal_x,goal_y, goal_z) in agents_pos:
+            for agent_id, (start_x,start_y, start_z, goal_x,goal_y, goal_z) in enumerate(agents_pos):
                 # check the validation of the position
                 if self.is_valid_pos((start_x,start_y, start_z)) and self.is_valid_pos((goal_x,goal_y, goal_z)):
-                    self.num_agents += 1
-                    self.starts_pos[self.num_agents] = (start_x,start_y, start_z)
-                    self.goals_pos[self.num_agents] = (goal_x,goal_y, goal_z)
-                    self.agents.append(self.num_agents)
+                    self.agents[agent_id] = Agent(agent_id + 1, (start_x, start_y, start_z),(goal_x, goal_y, goal_z))
                 else:
                     raise Exception('Failure! invalid position of agent')
                     return False

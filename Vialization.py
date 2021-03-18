@@ -10,7 +10,7 @@ num_floors = 3
 num_cols = 10
 num_rows = 10
 floor_w = FRAME_WIDTH
-floor_h = FRAME_HEIGHT/num_floors
+floor_h = FRAME_HEIGHT / num_floors
 cell_w = floor_w/num_cols
 cell_h = floor_h/num_rows
 
@@ -71,7 +71,7 @@ class ScrollableFrame(Frame):
 
 #the canvas class
 class Visualize:
-    def __init__(self, world_data, paths, conflicts_steps):
+    def __init__(self, world_data, paths, conflicts_steps= None):
         self.root = Tk()
 
         minimal_canvas_size = (FRAME_WIDTH, FRAME_HEIGHT)
@@ -161,11 +161,11 @@ class Visualize:
     #the function get pos of agent in world, and draw it
     def draw_agent(self, x,y,z, color):
 
-        if not self.i:                                         # for the first step
+        if not self.i or not self.conflicts:                                         # for the first step
             self.vis_cells[x][y][z] = self.frame.canvas.create_rectangle(FRAME_MARGIN + x * cell_w,y * cell_h + z * floor_h + FRAME_MARGIN,FRAME_MARGIN + (x + 1) * cell_w,(y + 1) * cell_h + z * floor_h + FRAME_MARGIN,fill=color)
             self.vis_cells[x][y][z] = 1
             return
-        if (x,y,z) not in self.conflicts[self.i - 1]:          # if this pos is without conflicts
+        if self.conflicts and (x,y,z) not in self.conflicts[self.i - 1]:          # if this pos is without conflicts
             self.vis_cells[x][y][z] = self.frame.canvas.create_rectangle(FRAME_MARGIN + x*cell_w, y*cell_h + z*floor_h + FRAME_MARGIN, FRAME_MARGIN + (x +1)*cell_w, (y+1)*cell_h + z*floor_h + FRAME_MARGIN, fill=color)
             self.vis_cells[x][y][z] = 1
         else:

@@ -1,20 +1,28 @@
 from Vialization import *
 from World import *
 import Search
+import time
+start_time = time.time()
 
-a = World(600, 800, 800)
+world = World(600, 800, 800)
 agents_pos = [(0,0,0,2,0,1), (9,9,1,2,3,0),(1,7,0,4,5,1), (7,0,0,1,5,0),(3,5,0,9,0,0),(9,0,0,0,9,0),(4,2,0,9,2,0)]
-#add the agents to world
-a.add_agents(agents_pos)
-agents = a.get_agents()
-paths , conflict_steps = Search.find_path(agents, a)         #get the paths for the agents
+agents_pos_2 = [(7, 6, 0, 5, 1, 0), (5, 2, 0, 6, 4, 0), (0, 6, 0, 6, 1, 0), (0, 5, 0, 1, 7, 0), (3, 6, 0, 5, 5, 0)]
+
+world.add_agents(agents_pos_2)                                     # add the agents to world
+agents = world.get_agents()
+paths = Search.path_finding(agents, world)         # get the paths for the agents
 print(paths)
-print("conflict_steps; ", conflict_steps)
+#print("conflict_steps; ", conflict_steps)
+print("--- %s seconds ---" % (time.time() - start_time))
+#-------------------------------------------------------------------
+
+
+
 
 #----------------------------draw the world-------------------------
 
 
-vis = Visualize(a, paths , conflict_steps)
+vis = Visualize(world, paths )
 vis.draw()
 
 vis.frame.pack(fill=BOTH, expand=True)
