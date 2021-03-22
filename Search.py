@@ -164,7 +164,7 @@ def path_finding(agents, world):
 
         # call for method that try to find free step for all agents
         if get_next_step(agents_list, 0, step_unit, world):                # we fount step for all agents
-            print("current\n", step_unit.current_steps_list, "\nprev\n", step_unit.prev_steps)
+            #print("current\n", step_unit.current_steps_list, "\nprev\n", step_unit.prev_steps)
             current_steps = step_unit.current_steps_list
             step_unit = StepUnit(step_unit.time + 1)                       # Advances the steps in one
             step_unit.set_current_steps_list(current_steps)                # update the current steps for the new time

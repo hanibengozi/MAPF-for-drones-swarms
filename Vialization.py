@@ -174,8 +174,8 @@ class Visualize:
 
     #the function get position of agent and draw them. if type==1 this is current steps else is preve steps
     def draw_agents(self, current_steps, preve_steps, goal_steps):
-        colors_current = ['purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange']
-        colors_prev = ['#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280']
+        colors_current = ['purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange']
+        colors_prev = ['#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280']
 
         for i, step in enumerate(current_steps):
             if step:
