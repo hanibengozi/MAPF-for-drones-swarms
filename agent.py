@@ -6,7 +6,11 @@ class Agent:
         self.goal_pos = goal_pos
         self.speed = speed
         self.current_step = start_pos
+        self.forbidden_step = []
         self.path = []
+
+    def set_forbidden_step(self, forbidden_step):
+        self.forbidden_step = forbidden_step
 
     def set_current_step(self, current_step):
         self.current_step = current_step

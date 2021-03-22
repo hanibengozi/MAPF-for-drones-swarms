@@ -71,7 +71,7 @@ class ScrollableFrame(Frame):
 
 #the canvas class
 class Visualize:
-    def __init__(self, world_data, paths, conflicts_steps= None):
+    def __init__(self, world_data, paths, conflicts_steps=None):
         self.root = Tk()
 
         minimal_canvas_size = (FRAME_WIDTH, FRAME_HEIGHT)
@@ -86,11 +86,16 @@ class Visualize:
         self.agents_path = paths
         self.conflicts = conflicts_steps
         self.get_max_path_len()          # get the num steps
-
+        self.set_gaols_pos()
         # self.cell_h, self.cell_w = self.get_cell_size()
         # self.agent_h, self.agent_w = self.get_agent_size(1)
         self.vis_cells = np.zeros((world_data.width, world_data.length, world_data.height), dtype=int)
         #self.aindx_obj = dict()
+
+    def set_gaols_pos(self):
+        self.goals = []
+        for agent_id in self.agents_path:
+            self.goals.append(self.agents_path[agent_id][-1])
 
     def get_max_path_len(self):
         max_pathlen = 0
@@ -98,12 +103,6 @@ class Visualize:
             if len(self.agents_path[agent]) > max_pathlen:
                 max_pathlen = len(self.agents_path[agent])
         self.num_steps = max_pathlen
-
-    #draw the path for all agents
-    def draw(self):
-        for i in range(self.num_steps):
-            self.draw_world()
-            self.frame.pack(fill=BOTH, expand=1)
 
     def get_currentStep(self):
         current_steps = []
@@ -127,6 +126,12 @@ class Visualize:
                     prev_steps.append(None)
         return prev_steps
 
+    # draw the path for all agents
+    def draw(self):
+        for i in range(self.num_steps):
+            self.draw_world()
+            self.frame.pack(fill=BOTH, expand=1)
+
     #draw  one step, for all agents
     def draw_one_step(self):
         if self.i == -1 or self.i > self.num_steps:   #for the first time, when load the world, and when thw steps finish
@@ -140,8 +145,6 @@ class Visualize:
         self.draw_agents(current_steps, prev_steps, goal_steps)
         self.frame.pack(fill=BOTH, expand=1)
         self.i += 1
-
-
 
     #draw the world, all the floors, each floor like a grid
     def draw_world(self):
@@ -159,7 +162,11 @@ class Visualize:
         btn.place(x=floor_w/2, y=floor_h*num_floors +FRAME_MARGIN)
 
     #the function get pos of agent in world, and draw it
-    def draw_agent(self, x,y,z, color):
+    def draw_agent(self, x,y,z, color, goal=0):
+        """if goal:
+            self.vis_cells[x][y][z] = self.frame.canvas.create_rectangle(FRAME_MARGIN + x * cell_w, y * cell_h + z * floor_h + FRAME_MARGIN, FRAME_MARGIN + (x + 1) * cell_w, (y + 1) * cell_h + z * floor_h + FRAME_MARGIN, width=3, outline=color, fill='white')
+            self.frame.canvas.itemconfig(self.vis_cells[x][y][z])
+            return"""
 
         if not self.i or not self.conflicts:                                         # for the first step
             self.vis_cells[x][y][z] = self.frame.canvas.create_rectangle(FRAME_MARGIN + x * cell_w,y * cell_h + z * floor_h + FRAME_MARGIN,FRAME_MARGIN + (x + 1) * cell_w,(y + 1) * cell_h + z * floor_h + FRAME_MARGIN,fill=color)
@@ -191,4 +198,8 @@ class Visualize:
                 if goal_steps[agent]:
                     x,y,z = goal_steps[agent]
                     self.draw_agent(x,y,z,colors_current[agent - 1])
+
+        """for goal_pos in self.goals:
+            x,y,z = goal_pos
+            self.draw_agent(x, y, z, colors_current[self.goals.index(goal_pos)], 1)"""
 
