@@ -6,12 +6,10 @@ class World:
         self.height = height
         self.width = width
         self.length = length
-        self.num_floors = 3
-        self.num_rows = 10                                  # length
-        self.num_cols = 10                                  # width
-        self.agents = []                                    # list of agent object
-        #self.floors = dict()
-        #self.cells = np.zeros((length, width), dtype=int)
+        self.num_floors = 6
+        self.num_rows = 8                                # length
+        self.num_cols = 8                                # width
+        self.agents = []                                   # list of agent object
 
     #the functuon get list of agents position(start & end), end add them to world
     def add_agents(self,agents_pos):

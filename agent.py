@@ -6,6 +6,7 @@ class Agent:
         self.goal_pos = goal_pos
         self.speed = speed
         self.current_step = start_pos
+        self.change_direction = [0, -1]
         self.forbidden_step = []
         self.path = []
 
