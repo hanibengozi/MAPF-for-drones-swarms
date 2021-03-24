@@ -177,14 +177,12 @@ class Visualize:
             self.vis_cells[x][y][z] = 1
         else:
             self.vis_cells[x][y][z] = self.frame.canvas.create_rectangle(FRAME_MARGIN + x * cell_w, y * cell_h + z * floor_h + FRAME_MARGIN, FRAME_MARGIN + (x + 1) * cell_w, (y + 1) * cell_h + z * floor_h + FRAME_MARGIN, fill='red')
-
-
         self.frame.canvas.itemconfig(self.vis_cells[x][y][z])
 
     #the function get position of agent and draw them. if type==1 this is current steps else is preve steps
     def draw_agents(self, current_steps, preve_steps, goal_steps):
-        colors_current = ['purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange', '#663300', '#ff0066', '#476b6b', '#4dff4d', '#999999', '#33ccff', '#666699']
-        colors_prev = ['#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280', '#cc6600', '#ff80b3', '#85adad', '#99ff99', '#cccccc', '#99e6ff', '#b3b3cc']
+        colors_current = ['purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange','purple', 'black', 'pink', 'green', 'blue', 'yellow', 'orange']
+        colors_prev = ['#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280','#e600e6', '#808080', '#ffccd5', '#4dff4d', '#8080ff', '#ffff80', '#ffd280']
 
         for i, step in enumerate(current_steps):
             if step:
