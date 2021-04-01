@@ -9,6 +9,7 @@ class TimeUnit:
         self.current_steps = []                     # contain all the steps in this time, prev, fix and current
         self.fix_steps = []                         # contain the fix steps
         self.prev_time_unit = prev_time_unit
+        self.update = None
 
     # this method add current step to the current step list
     def add_current_step(self, current_step):
@@ -24,8 +25,18 @@ class TimeUnit:
         if fix_step not in self.fix_steps:
             self.fix_steps.append(fix_step)
 
+    # this method get fix step and take it off the list
+    def remove_fix_step(self, fix_step):
+        if fix_step in self.fix_steps:
+            self.fix_steps.remove(fix_step)
+
+    # this method get fix step and take it off the list
+    def remove_step_current(self, step):
+        if step in self.current_steps:
+            self.current_steps.remove(step)
+
     def set_prev_steps(self, prev_steps):
-        self.prev_steps = prev_steps
+        self.prev_steps = prev_steps.copy()
 
     def set_current_steps(self, current_steps):
-        self.current_steps = current_steps
+        self.current_steps = current_steps.copy()

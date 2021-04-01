@@ -5,9 +5,16 @@ class Drone:
         self.goal_pos = goal_pos
         self.speed = speed
         self.current_step = start_pos
-        self.stay_in_place = [start_pos, 0]
+        self.stay_in_place = [start_pos, 1]
+        self.stay_in = 6                         # define not to stay in same place
+        self.change_direction = []
+        self.update_change_direction = False
+        self.forbidden_steps = []
         self.path = []
         self.steps = []
+
+    def add_forbidden_step(self, forbidden_step):
+        self.forbidden_steps.append(forbidden_step)
 
     def set_current_step(self, current_step):
         self.current_step = current_step

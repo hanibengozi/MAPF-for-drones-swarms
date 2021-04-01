@@ -6,9 +6,9 @@ class World:
         self.height = height
         self.width = width
         self.length = length
-        self.num_floors = 6
-        self.num_rows = 8                                # length
-        self.num_cols = 8                                # width
+        self.num_floors = 3
+        self.num_rows = 5                                # length
+        self.num_cols = 5                             # width
         self.agents = []                                   # list of agent object
 
     #the functuon get list of agents position(start & end), end add them to world
@@ -26,7 +26,7 @@ class World:
 
     #get position of agent in world, and return if the position is valid
     def is_valid_pos(self, agent_pos):
-        x,y,z = agent_pos
+        x, y, z = agent_pos
         if x < 0 or x > self.num_cols - 1 or y < 0 or y > self.num_rows - 1 or z < 0 or z > self.num_floors -1:
             return False
         else:
