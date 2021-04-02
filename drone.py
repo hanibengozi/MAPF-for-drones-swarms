@@ -6,6 +6,7 @@ class Drone:
         self.speed = speed
         self.current_step = start_pos
         self.stay_in_place = [start_pos, 1]
+        self.collides_with = None
         self.stay_in = 6                         # define not to stay in same place
         self.change_direction = []
         self.update_change_direction = False

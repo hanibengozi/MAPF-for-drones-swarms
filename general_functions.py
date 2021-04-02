@@ -20,26 +20,25 @@ def get_all_steps(agent, world):
             without_deviation = 2
 
         next_step = list(agent.current_step)
-        next_step[coordinate] += direction                  # up, or right
+        next_step[coordinate] += direction                 # up, or right
 
         if tuple(next_step) == agent.goal_pos:             # define if this step is goal
-            # define if this agent in goal more than one time.
-            is_goal = 1
+            is_goal = 1                                    # define if this agent in goal more than one time.
 
-
-        if world.is_valid_pos(tuple(next_step)):            # if this step valid, add to steps list
+        if world.is_valid_pos(tuple(next_step)):           # if this step valid, add to steps list
             next_step = Step(tuple(next_step), coordinate, without_deviation, agent, is_goal)
             steps.append(next_step)
 
         next_step = list(agent.current_step)
-        next_step[coordinate] -= direction                  # down, or left
+        next_step[coordinate] -= direction                 # down, or left
 
         if tuple(next_step) == agent.goal_pos:             # define if this step is goal
             is_goal = 1
 
-        if world.is_valid_pos(tuple(next_step)):            # if this step valid, add to steps list
+        if world.is_valid_pos(tuple(next_step)):           # if this step valid, add to steps list
             next_step = Step(tuple(next_step), coordinate, with_deviation, agent, is_goal)
             steps.append(next_step)
+
     return steps
 
 # the method get step, and return the next step to goal
@@ -63,14 +62,17 @@ def move_fix_step(step, agent, time_unit, world):
     fix_step = step.collides_with_fix
     free_step_to_fix_step = None
     fix_agent_goal_pos = fix_step.agent.goal_pos
-    fix_step.agent.goal_pos = agent.goal_pos                       # to get all steps with deviation according to agent goal
+    if fix_step.step != agent.goal_pos:
+        fix_step.agent.goal_pos = agent.goal_pos                       # to get all steps with deviation according to agent goal
+
     steps = get_all_steps(fix_step.agent, world)                   # get all steps (nighbors for fix step)
 
     for s in steps:
-        if check_free_step(s, time_unit.prev_time_unit.current_steps):    # if the nighbors dont collides with steps in prev time
-            if s.collides_with != s.Collision.collides_fix:  # and this step not collides with fix
-                if s.deviation:
-                    free_step_to_fix_step = s                   # save this step
+        if check_free_step(s, time_unit, time_unit.prev_time_unit.current_steps):    # if the nighbors dont collides with steps in prev time
+            if check_free_step(s, time_unit, time_unit.current_steps):
+                if s.collides_with != s.Collision.collides_fix:  # and this step not collides with fix
+                    if s.deviation:
+                        free_step_to_fix_step = s                   # save this step
 
     fix_step.agent.goal_pos = fix_agent_goal_pos                # update back the goal pos for fix agent
 
@@ -91,7 +93,7 @@ def get_next_step(agent, time_unit, world):
     steps = get_possible_steps(agent, time_unit, world)     # get all possible steps
 
     for step in steps:
-        if check_free_step(step, time_unit.current_steps):             # if this step not collides with current steps
+        if check_free_step(step, time_unit, time_unit.current_steps):             # if this step not collides with current steps
 
             #if agent.update_change_direction and step.deviation != 0:      # for provide next time to choose step, that make infinity loop.
                 #agent.change_direction.append((time_unit.time + 1, step.coordinate))
@@ -105,8 +107,8 @@ def get_next_step(agent, time_unit, world):
             # in case i take the same step, stay in place. count how many times in the same place
             if step.step == agent.stay_in_place[0]:
                 agent.stay_in_place[1] += 1
-                if step.step != agent.goal_pos and agent.stay_in_place[1] > 2:
-                    continue
+                #if step.step != agent.goal_pos and agent.stay_in_place[1] > 2:
+                    #continue
             else:
                 agent.stay_in_place = [step.step, 1]
 
@@ -135,41 +137,37 @@ def get_possible_steps(agent, time_unit, world):
     # pass on all the steps, and take first the steps without deviation
     for step in steps:
         if not step.deviation:                                # in case this step without deviation, deviation = 0
-            if check_free_step(step, time_unit.prev_steps):   # check collision with prev (prev + fix) steps list
+            if check_free_step(step, time_unit, time_unit.prev_steps):   # check collision with prev (prev + fix) steps list
                 sorted_steps.append(step)
-            else:
-                agent.update_change_direction = True
 
     # enter the the same step, in case we want to stay in place
-    #if not sorted_steps and agent.stay_in_place[0] == agent.current_step and :
     step = Step(agent.current_step, -1, 0, agent)
     sorted_steps.append(step)
-    #else:
-        #agent.add_forbidden_step(agent.current_step)
 
     # pass on all the steps, and take second the steps with deviation that the coordinate not in right place yet.
     for step in steps:
         if step.deviation == 2:
-            if check_free_step(step, time_unit.prev_steps):   # check collision with prev (prev + fix) steps list
+            if check_free_step(step, time_unit, time_unit.prev_steps):   # check collision with prev (prev + fix) steps list
                 sorted_steps.append(step)
-
 
     # take all the rest of steps
     for step in steps:
-        if step not in sorted_steps:
-            if check_free_step(step, time_unit.prev_steps):   # check collision with prev (prev + fix) steps list
+        if step not in sorted_steps and step.deviation:
+            if check_free_step(step, time_unit, time_unit.prev_steps):   # check collision with prev (prev + fix) steps list
                 sorted_steps.append(step)
 
     return sorted_steps
 
 # the method get step, and dict of steps and check that their are no conflict in this step, retuen True in case the step free.
-def check_free_step(step, steps_list):
+def check_free_step(step, time_unit, steps_list):
 
     # In case the step is in dictionaries then we will check that their value is not equal to that agent
     for s in steps_list:
         if step.step == s.step:
             if step.agent.id != s.agent.id:
-                if s.is_goal <= 1:        # in case this step not collides with fix steps, Other treatment for fix steps
+                # in case this step not collides with fix steps or in the case the agents are not waiting for each other
+                if s.is_goal <= 1 and not in_step_in_time_forbidden(step.agent, s.agent, s, time_unit):
+                    time_unit.step_in_time_forbidden.append(((step.agent.id, s.agent.id), time_unit.time))
                     return False
                 else:                     # in case this step collides with fix step, return this step and update for late checking
                     step.collides_with = step.Collision.collides_fix
@@ -177,6 +175,18 @@ def check_free_step(step, steps_list):
                     return True
 
     return True
+
+# this method get 2 agents, and return if they collides between each other more than one time
+def in_step_in_time_forbidden(agent, agent_collides, agent_collides_step, time_unit):
+
+    if agent_collides_step.step != agent_collides.current_step:  # in case the agents collides in current and prev
+        return False
+
+    if ((agent.id , agent_collides.id), time_unit.time - 1) in time_unit.step_in_time_forbidden:
+        if ((agent_collides.id , agent.id), time_unit.time - 1) in time_unit.step_in_time_forbidden:
+            if ((agent_collides.id , agent.id), time_unit.time) in time_unit.step_in_time_forbidden:
+                return True
+    return False
 
 # this method get dict of paths, and return for each path his length
 # return dict, the key- agent id, the value- length of path for this agent
@@ -216,23 +226,17 @@ def sort_agents_by_time_of_stay_in_place(agents):
     agents_len_by_stay_in_place = {}
     flag = 0
 
-    for agent in agents:                               # get the length of how many time each agent stay in place
+    # get the length of how many time each agent stay in place
+    for agent in reversed(agents):
         if agent.stay_in_place[0] != agent.goal_pos:
             agents_len_by_stay_in_place[agent] = agent.stay_in_place[1]
-            if agent.stay_in_place[1] > 1:  # in case of a least one of the agent stay in place more than 8 times
-                #agent.not_stay_in = 1
-                flag = 1                    # define that we need to sort the array
+            if agent.stay_in_place[1] > 1:                           # in case of a least one of the agent stay in place
+                flag = 1                                             # define that we need to sort the array
         else:
-            agents_len_by_stay_in_place[agent] = 0
+            agents_len_by_stay_in_place[agent] = 0                   # if agent in goal, put him in the end of list
 
     if flag:
         sort_agents(agents, agents_len_by_stay_in_place)
-
-        for agent in agents:        # After sorting, reset the time of stay in place for each drone.
-            if agent.stay_in_place[0] != agent.goal_pos:
-                agent.stay_in_place[1] = 0
-
-
 
 # this method get list of agents, from type object dron, and return list of their id`s
 def get_agents_id(agents):

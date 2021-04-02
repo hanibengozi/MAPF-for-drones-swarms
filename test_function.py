@@ -1,7 +1,8 @@
 import math
 from random import randrange, randint
 import search
-
+import time
+start_time = time.time()
 
 #generates random start and gaol positions for each agent.
 def random_inputs(num_of_floors, num_of_raws, num_of_cols, num_of_agents):
@@ -76,7 +77,7 @@ def check_conflicts(agents, paths):
                 if step not in current_steps:
                     current_steps.append(step)
                 else:
-                    print("curent step: ", current_steps, "time: ", time)
+                    print("curent step: ", current_steps, "time: ", time, "agent ", agent)
                     return True
                 if time > 0:
                     step = paths[agent][time - 1]
@@ -110,3 +111,30 @@ def path_equalize(agents, paths, max_pathlen = -1):
             path.append( (last_step[0], last_step[1], last_step[2] ) )
         paths[agent] = path
     return paths
+
+def main(world):
+
+    count = 0
+    count_conflicts = 0
+    counter_faild = 0
+
+    for i in range(1):
+        #world = World(600, 800, 800)
+        agents_pos = random_inputs(6, 8, 8, 100)
+        world.add_agents(agents_pos)                # add the agents to world
+        agents = world.get_agents()
+        paths = search.path_finding(agents, world)  # get the paths for the agents
+        print("--- %s seconds ---" % (time.time() - start_time))
+        if paths:
+            if not check_conflicts(agents, paths):
+                count += 1
+                #path_len_ratio = path_length_ratio(agents, world)
+                #print("the agents pos:\n", agents_pos, "\nthe paths: \n", paths, "\nSucssiedddddddd\n", "path_len_ratio\n", path_len_ratio)
+            else:
+                count_conflicts += 1
+                #print("their is a conflictssssssssssssssss\n")
+        else:
+            counter_faild += 1
+            #print("the algorithem didnt find paths for this agents_pos\n")
+
+        print("count of sucsses is: ", count, "count of conflictsss: ", count_conflicts, "count of faild: ", counter_faild)
