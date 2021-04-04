@@ -1,7 +1,7 @@
 from tkinter import *
 from Vialization import *
 import test
-import draw_paths.Platform as p
+import show_paths.Platform as p
 from PIL import Image, ImageTk
 
 class Dashboard(Frame):
