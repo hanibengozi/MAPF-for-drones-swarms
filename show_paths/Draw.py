@@ -1,10 +1,5 @@
 '''
 This is a help file to draw a 3D graph of paths.
-
-Author: Ayelet Zadock
-Phone: +972-(0)55-6870760
-Date of last update: March 14 2021
-All Rights Reserved (C)
 '''
 
 # Imports:
