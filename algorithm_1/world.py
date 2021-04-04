@@ -1,5 +1,5 @@
 import numpy as np
-from drone import *
+from algorithm_1.drone import *
 
 class World:
     def __init__(self, height, width, length):

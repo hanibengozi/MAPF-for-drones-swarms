@@ -1,4 +1,4 @@
-from step import *
+from algorithm_1.step import *
 
 
 

@@ -1,6 +1,6 @@
 import math
 from random import randrange, randint
-import search
+import algorithm_1.search as search
 import time
 start_time = time.time()
 

@@ -1,6 +1,6 @@
-import general_functions
-from time_unit import *
-from step import *
+import algorithm_1.general_functions as general_functions
+from algorithm_1.time_unit import *
+from algorithm_1.step import *
 from pip._vendor.msgpack.fallback import xrange
 
 # this method find paths for all agents, with conflicts
