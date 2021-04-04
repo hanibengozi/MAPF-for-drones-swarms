@@ -1,6 +1,6 @@
-from world import *
-import search
-import test_function
+from algorithm_1.world import *
+import algorithm_1.search
+import algorithm_1.test_function
 
 # ---------------------------------define the world---------------------------------------
 
@@ -46,4 +46,4 @@ else:
     print("their are conflictssssssssssssssssss")"""
 
 
-test_function.main(world)
+algorithm_1.test_function.main(world)
