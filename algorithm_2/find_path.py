@@ -1,0 +1,663 @@
+import math_graph
+import random
+from math_graph import Point3D
+from datetime import datetime
+import math as m
+
+'''
+dont forget to check if busy for the point around also with another fixed points that may be move
+font filter keep the same point for shared fixed 
+save in teh dic all the list of around points nd not only one
+on moving check all the list and not only one
+'''
+class GraphManager:
+    def __init__(self, matrix_cube_size):
+        self.matrix_cube_size = matrix_cube_size
+
+    def get_around_points(self, point):
+        points = list()
+        points.append(math_graph.Point3D(point.x + 1, point.y, point.z))
+        points.append(math_graph.Point3D(point.x - 1, point.y, point.z))
+        points.append(math_graph.Point3D(point.x, point.y + 1, point.z))
+        points.append(math_graph.Point3D(point.x, point.y - 1, point.z))
+        points.append(math_graph.Point3D(point.x, point.y, point.z + 1))
+        points.append(math_graph.Point3D(point.x, point.y, point.z - 1))
+        points_filtered = self.filter_matrix_points(points)
+        return points_filtered
+
+    def random_point(self):
+        return Point3D(random.randint(
+            0, self.matrix_cube_size[0] - 1), random.randint(0, self.matrix_cube_size[1] - 1), random.randint(0, self.matrix_cube_size[2] - 1))
+
+    def get_original_path_length(self, from_point, to_point):
+        return abs(from_point.x - to_point.x) + abs(from_point.y - to_point.y) + abs(from_point.z - to_point.z)
+
+    def filter_matrix_points(self, points):
+        points_filtered = list()
+        for s in points:
+            if s.x >= self.matrix_cube_size[0] or s.x < 0:
+                continue
+            if s.y >= self.matrix_cube_size[1] or s.y < 0:
+                continue
+            if s.z >= self.matrix_cube_size[2] or s.z < 0:
+                continue
+
+            points_filtered.append(s)
+
+        return points_filtered
+
+    def get_steps_to_destination(self, current_point, to_point, can_stay):
+        available_steps = list()
+        # put the direction points
+        if(current_point.z > to_point.z):
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y, current_point.z - 1))
+        elif current_point.z < to_point.z:
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y, current_point.z + 1))
+        if(current_point.y > to_point.y):
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y - 1, current_point.z))
+        elif current_point.y < to_point.y:
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y + 1, current_point.z))
+        if(current_point.x > to_point.x):
+            available_steps.append(math_graph.Point3D(
+                current_point.x - 1, current_point.y, current_point.z))
+        elif current_point.x < to_point.x:
+            available_steps.append(math_graph.Point3D(
+                current_point.x + 1, current_point.y, current_point.z))
+
+        # put the back direction points , add order go back if firsst direction
+        if(current_point.z < to_point.z):
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y, current_point.z - 1))
+        elif current_point.z > to_point.z:
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y, current_point.z + 1))
+        if(current_point.y < to_point.y):
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y - 1, current_point.z))
+        elif current_point.y > to_point.y:
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y + 1, current_point.z))
+        if(current_point.x < to_point.x):
+            available_steps.append(math_graph.Point3D(
+                current_point.x - 1, current_point.y, current_point.z))
+        elif current_point.x > to_point.x:
+            available_steps.append(math_graph.Point3D(
+                current_point.x + 1, current_point.y, current_point.z))
+
+        if(current_point.z == to_point.z):
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y, current_point.z - 1))
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y, current_point.z + 1))
+        if(current_point.y == to_point.y):
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y - 1, current_point.z))
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y + 1, current_point.z))
+        if(current_point.x == to_point.x):
+            available_steps.append(math_graph.Point3D(
+                current_point.x - 1, current_point.y, current_point.z))
+            available_steps.append(math_graph.Point3D(
+                current_point.x + 1, current_point.y, current_point.z))
+
+        if can_stay:
+            available_steps.append(math_graph.Point3D(
+                current_point.x, current_point.y, current_point.z))
+
+        available_steps_filtered = self.filter_matrix_points(available_steps)
+        available_steps_filtered.reverse()
+        return available_steps_filtered
+
+
+class Agent:
+    def __init__(self, id, from_point, to_point, path_manager):
+        self.id = id
+        self.path_manager = path_manager
+        self.from_point = from_point
+        self.to_point = to_point
+        self.path = []
+        self.original_path_length = self.get_original_path_length()
+
+    def get_original_path_length(self):
+        return self.path_manager.get_original_path_length(self.from_point, self.to_point)
+
+
+class AgentManager:
+    def __init__(self, path_manager):
+        self.next_id_counter = 0
+        self.path_error_counter = 0
+        self.cannot_move_fixed_error_counter = 0
+        self.path_manager = path_manager
+        self.agents = list()
+
+    def get_agents_path_list(self):
+        self.init_agents_path()
+        path = list()
+        for a in self.agents:
+            path.append(a.path)
+        return path
+
+    def init_agent_path(self, a):
+        a.path = self.path_manager.get_path(a.from_point, a.to_point, False, a.id)
+        if a.path == False:
+            a.path = self.path_manager.get_path(a.from_point, a.to_point, True, a.id)
+        if a.path == False:
+            #print("error:", a.from_point, ",", a.to_point)
+            self.path_error_counter += 1
+
+    def build_fixed_places(self):
+        points = list(map(lambda a: (a.id, a.to_point), self.agents))
+        self.path_manager.build_fixed_places(points)
+
+    def init_agents_path(self):
+        def agent_order_key(a):
+            return a.get_original_path_length()
+        # order by path desc
+        self.agents.sort(key=agent_order_key, reverse=True)
+        self.build_fixed_places()
+        # get path for each agent
+        for a in self.agents:
+            self.init_agent_path(a)
+            self.path_manager.update_busy(a.path)
+            self.path_manager.update_fixed_places_arrived_time(
+                a.to_point, a.path)
+        # update fixed agents collision
+        for a in self.agents:
+            self.check_path_fixed_collision(a.path, a.id)
+
+    def check_path_fixed_collision(self, path, agent_id):
+        if path == False:
+            return
+        # add if the agent path is already know then we can also check the time
+        for p in path:
+            fixed_point = self.path_manager.get_fixed_point(
+                Point3D.get_point_time_tuple(p), p[0], agent_id)
+            if fixed_point is not None:
+                agents_to_move = filter(
+                    lambda a: a .id == fixed_point.agent_id, self.agents)
+                agent_to_move = list(agents_to_move)[0]
+                success = self.path_manager.move_fixed_point(
+                    p[0], agent_to_move.path, fixed_point)
+                if not success:
+                    self.cannot_move_fixed_error_counter+=1
+                    print("len:", len(fixed_point.around_points_list))
+                    print("cannot move fixed point:",
+                          fixed_point, "agent id:", agent_id)
+
+    def create_agents(self, agent_points_list):
+        # TODO validate points, from point not the same, next point of one no in the prev point
+        for a in agent_points_list:
+            self.next_id_counter += 1
+            a = Agent(self.next_id_counter, a[0], a[1], self.path_manager)
+            self.agents.append(a)
+
+    def get_random_agents(self, agents_count):
+        from_points = set()
+        to_points = set()
+        agents = list()
+        from_point = None
+        to_point = None
+        for i in range(0, agents_count):
+            while(True):
+                from_point = self.path_manager.random_point()
+                point_tuple = from_point.to_tuple()
+                if point_tuple not in from_points:
+                    from_points.add(point_tuple)
+                    break
+
+            while(True):
+                to_point = self.path_manager.random_point()
+                point_tuple = to_point.to_tuple()
+                if point_tuple not in to_points:
+                    to_points.add(point_tuple)
+                    break
+            agents.append([from_point, to_point])
+        return agents
+
+
+class PathManager:
+    def __init__(self, graph_manager):
+        self.points_manager = PointsManager(graph_manager)
+        self.graph_manager = graph_manager
+
+    def update_fixed_places_arrived_time(self, fixed_point, path):
+        if path != False:
+            self.points_manager.update_fixed_places_arrived_time(
+                fixed_point, len(path) - 1)
+
+    def move_fixed_point(self, time, path_array, fixed_point):
+        return self.points_manager.move_fixed_point(time, path_array, fixed_point)
+
+    def get_fixed_point(self, point, time, agent_id):
+        return self.points_manager.get_fixed_point(point, time,  agent_id)
+
+    def build_fixed_places(self, points):
+        self.points_manager.build_fixed_places(points)
+
+    def random_point(self):
+        return self.graph_manager.random_point()
+
+    def remove_busy(self, points):
+        self.points_manager.remove_busy(points)
+
+    def get_original_path_length(self, from_point, to_point):
+        return self.graph_manager.get_original_path_length(from_point, to_point)
+
+    def update_busy(self, path):
+        if path != False:
+            self.points_manager.update_busy(path)
+
+    def set_all_busy(self, max_time):
+        self.points_manager.set_all_busy(
+            max_time, self.graph_manager.matrix_cube_size[0], self.graph_manager.matrix_cube_size[1], self.graph_manager.matrix_cube_size[2])
+
+    def get_path(self, from_point, to_point, can_stay, agent_id):
+        if from_point == to_point:
+            return [(0, from_point.x, from_point.y, from_point.z)]
+
+        visited_points_in_time_unit = set()
+        path_step_stack = list(
+            [PointVertex(None, from_point, (0, from_point.x, from_point.y, from_point.z))])
+        path = list()
+        time = 0
+        while(len(path_step_stack) > 0):
+            vertex_point = path_step_stack.pop()
+            time_point = vertex_point.time_point
+            time = time_point[0]
+            step = vertex_point.point
+            if step == to_point:
+                pointer = vertex_point
+                while(True):
+                    path.append(pointer.time_point)
+                    if pointer.parent is None:
+                        break
+                    pointer = pointer.parent
+
+                path.reverse()
+                return path
+
+            if time_point in visited_points_in_time_unit:
+                continue
+
+            visited_points_in_time_unit.add(time_point)
+
+            steps = self.graph_manager.get_steps_to_destination(
+                step, to_point, can_stay)
+
+            steps_filtered = list()
+            for s in steps:
+                if self.points_manager.is_time_unit_busy((time + 1, s.x, s.y, s.z)):
+                    continue
+
+                if (time + 1, s.x, s.y, s.z) in visited_points_in_time_unit:
+                    continue
+
+                if self.points_manager.is_blocking_fixed_point(time + 1, s, agent_id):
+                    continue
+
+                if can_stay and self.check_wait_time(vertex_point, 6):
+                    continue
+                # if can_stay and (vertex_point.parent is not None and vertex_point.parent.point == s):
+                #    continue
+
+                steps_filtered.append(PointVertex(
+                    vertex_point, s, (time + 1, s.x, s.y, s.z)))
+
+            path_step_stack.extend(steps_filtered)
+
+        return False
+
+    def check_wait_time(self, point_vertex, time):
+        same_point = 0
+        current_point = point_vertex
+        for i in range(0, time):
+            if current_point.parent is not None and current_point.parent.point == current_point.point:
+                same_point += 1
+            if current_point.parent is not None:
+                current_point = current_point.parent
+            else:
+                break
+        return time == same_point
+
+
+class PointsManager:
+    def __init__(self, graph_manager):
+        self.graph_manager = graph_manager
+        self.time_unit_busy = set()
+        self.fixed_points = {}
+        self.fixed_around_points = {}
+
+    def update_fixed_places_arrived_time(self, fixed_point, time):
+        self.fixed_points[fixed_point.to_tuple()].arrived_time = time
+
+    def is_blocking_fixed_point(self, time, point, agent_id):
+        if point.to_tuple() in self.fixed_around_points:
+            fixed_around_point_list = self.fixed_around_points[point.to_tuple()]
+            for fixed_around_point in fixed_around_point_list:
+                if fixed_around_point.fixed_point.agent_id != agent_id:
+                    if fixed_around_point.fixed_point.arrived_time == -1 or time > fixed_around_point.fixed_point.arrived_time:
+                        if not fixed_around_point.is_free(time, self):
+                            return True
+        return False
+
+    def move_fixed_point(self, time, path_array, fixed_point):
+        return fixed_point.move_free_place(time, path_array, fixed_point, self)
+
+    def get_fixed_point(self, point, time, agent_id):
+        fixed_point = None
+        if point.to_tuple() in self.fixed_points:
+            p = self.fixed_points[point.to_tuple()]
+            if p.agent_id != agent_id:
+                if p.arrived_time != -1 and time >= p.arrived_time + 2:
+                    fixed_point = p
+        return fixed_point
+
+    def build_fixed_places(self, points):
+        #TODO important add that if a fixed point have shared around points with other fixed, then keep the first or who have the less
+        all_around_points = {}
+        list_of_fixed = list()
+        for fp in points:
+            around_points = self.graph_manager.get_around_points(fp[1])
+            around_points_list = list()
+            for ap in around_points:
+                around_fixed_point = AroundFixedPoint(ap)
+                around_points_list.append(around_fixed_point)
+            fix_point = FixedPoint(fp[0], fp[1], around_points_list)
+            list_of_fixed.append(fix_point)
+
+        # sort by original around points
+        def fixed_points_order_key(a):
+            return len(a.around_points_list)
+
+        # order by path desc
+        list_of_fixed.sort(key=fixed_points_order_key, reverse=False)
+
+        for fp in list_of_fixed:
+            for ap in fp.around_points_list: 
+                if ap.point.to_tuple() in all_around_points:
+                    ap.belongs_to_other_fixed = True
+                else:
+                    all_around_points[ap.point.to_tuple()] = fp
+            
+            #fp.around_points_list = list(filter(
+             #       lambda a: a.belongs_to_other_fixed == False, fp.around_points_list))
+
+        for fp in list_of_fixed:
+            self.fixed_points[fp.point.to_tuple()] = fp
+            for ap in fp.around_points_list: 
+                if ap.point.to_tuple() in self.fixed_around_points:
+                    self.fixed_around_points[ap.point.to_tuple()].append(ap)
+                else:
+                    self.fixed_around_points[ap.point.to_tuple()] = [ap]
+            
+        # loop over points add to the set
+        # if the points is already on the set then delete it if we cannot delete we have less than 3 then we will delete from the first
+
+    def remove_busy(self, points):
+        for p in points:
+            self.time_unit_busy.discard(p)
+
+    def set_all_busy(self, max_time, max_x, max_y, max_z):
+        for t in range(1, max_time):
+            for x in range(0, max_x):
+                for y in range(0, max_y):
+                    for z in range(0, max_z):
+                        time_point_vector = (t, x, y, z)
+                        self.time_unit_busy.add(time_point_vector)
+
+    def update_busy(self, path):
+        if(path is not False):
+            for i in range(0, len(path)):
+                # add time_unit_busy in the fixed around fields
+                self.time_unit_busy.add(path[i])
+                if i > 0:
+                    time_point_vector = (
+                        path[i][0], path[i-1][1], path[i-1][2], path[i-1][3])
+                    self.time_unit_busy.add(time_point_vector)
+            last_time = path[len(path) - 1][0]
+            for i in range(1, 2):
+                time_point_vector = (
+                    last_time + i, path[last_time][1], path[last_time][2], path[last_time][3])
+                self.time_unit_busy.add(time_point_vector)
+
+    def is_time_unit_busy(self, time_unit_point):
+        return time_unit_point in self.time_unit_busy
+
+
+class FixedPoint:
+    def __init__(self, agent_id, point, around_points_list):
+        self.agent_id = agent_id
+        self.point = point
+        self.around_points_list = around_points_list
+        for ap in self.around_points_list:
+            ap.set_fixed_point(self)
+        self.arrived_time = -1
+
+    def set_arrived_time(self, arrived_time):
+        self.arrived_time = arrived_time
+
+    def has_at_least_one_more_around(self, time, points_manager, caller_point):
+        has_one_around = False
+        for p in self.around_points_list:
+            if not p.is_busy(time, points_manager) and p != caller_point:
+                has_one_around = True
+        return has_one_around
+
+    def move_free_place(self, time, path_array, fixed_point, points_manager):
+        move_point = None
+        for p in self.around_points_list:
+            if not p.is_busy(time, points_manager):
+                move_point = p
+                break
+        if move_point is not None:
+            move_point.choose_moving_point(time, path_array, points_manager)
+        return move_point is not None
+
+
+class AroundFixedPoint:
+    def __init__(self, point):
+        self.point = point
+        self.belongs_to_other_fixed = False
+
+    def set_fixed_point(self, fixed_point):
+        self.fixed_point = fixed_point
+
+    # define if a drone can use this point, ht the fixed point has enouph other points to move
+    def is_free(self, time, points_manager):
+        return self.fixed_point.has_at_least_one_more_around(time, points_manager, self)
+
+    # define if the fixed point can move to this free points or not
+    def is_busy(self, time, points_manager):
+        available = True
+        for t in range(time - 1, time + 3):
+            if points_manager.is_time_unit_busy((t, self.point.x, self.point.y, self.point.z)):
+                available = False
+                break
+        return not available
+
+    # move the fixed drone to this point to let another drone use the place
+    # check if we can move again if another drone have a collision
+    def choose_moving_point(self, time, path_array, points_manager):
+        last_time_point = path_array[len(path_array) - 1]
+        last_point = (last_time_point[1],
+                      last_time_point[2], last_time_point[3])
+        original_length = len(path_array)
+        for i in range(original_length, time + 3):
+            path_array.append(
+                (i, last_time_point[1], last_time_point[2], last_time_point[3]))
+
+        prev_place = path_array[time]
+        path_array[time - 1] = (time - 1, self.point.x,
+                                self.point.y, self.point.z)
+        path_array[time] = (time, self.point.x, self.point.y, self.point.z)
+        path_array[time + 1] = (time + 1, self.point.x,
+                                self.point.y, self.point.z)
+        path_array[time + 2] = prev_place
+
+        for t in range(time - 1, time + 3):
+            points_manager.time_unit_busy = path_array[t]
+
+
+class PointVertex:
+    def __init__(self, parent, point, time_point):
+        self.parent = parent
+        self.point = point
+        self.time_point = time_point
+
+
+class TestManager:
+    def __init__(self):
+        pass
+
+    def check_collision(self, path_list, time_unit_busy):
+        for i in range(0, len(path_list)):
+            path_i = path_list[i]
+            for j in range(i + 1, len(path_list)):
+                path_j = path_list[j]
+                for pi in range(0, len(path_i)):
+                    for pj in range(0, len(path_j)):
+                        # print(path_j)
+                        if path_i[pi] == path_j[pj]:
+                            print("path_i", path_i)
+                            print("path_j", path_j)
+                            print("time_unit_busy",
+                                  path_i[pi] in time_unit_busy)
+                            print("same point", path_i[pi], path_j[pj])
+
+    def run_case(self, agent_manager, drones_count):
+        random_points = agent_manager.get_random_agents(drones_count)
+        agent_manager.create_agents(random_points)
+        path_list = agent_manager.get_agents_path_list()
+        # print(path_list)
+        return path_list
+
+    def run_cases(self, drones_count, cases_num):
+        case_error = 0
+        case_move_error = 0
+        graph_manager = GraphManager((8, 8, 6))
+        for j in range(0, cases_num):
+            print("j:", j)
+            path_manager = PathManager(graph_manager)
+            agent_manager = AgentManager(path_manager)
+            before_time = datetime.now()
+            #print("before_time:", before_time)
+            self.run_case(agent_manager, drones_count)
+            after_time = datetime.now()
+            #print("after_time:", after_time)
+            #print("diff_time:", after_time - before_time)
+            case_error += agent_manager.path_error_counter
+            case_move_error += agent_manager.cannot_move_fixed_error_counter
+            
+        print("case_error:", case_error)
+        print("case_move_error:", case_move_error)
+
+    def run_maze(self):
+        graph_manager = GraphManager((8, 8, 6))
+        path_manager = PathManager(graph_manager)
+        path_manager.set_all_busy(100)
+        maze_path = list(((1, 1, 0, 0), (2, 0, 0, 0),
+                         (3, 0, 1, 0), (4, 0, 1, 1), (5, 0, 1, 2)))
+        path_manager.remove_busy(maze_path)
+        from_point = Point3D(1, 1, 0)
+        to_point = Point3D(0, 1, 2)
+        path = path_manager.get_path(from_point, to_point, False)
+        expected_path = list(((0, 1, 1, 0), (1, 1, 0, 0),
+                             (2, 0, 0, 0), (3, 0, 1, 0), (4, 0, 1, 1), (5, 0, 1, 2)))
+        #list_difference = [item for item in list1 if item not in list2]
+        assert path == expected_path
+        print(path)
+        path = path_manager.get_path(from_point, to_point, True)
+        expected_path = list(((0, 1, 1, 0), (1, 1, 0, 0),
+                             (2, 0, 0, 0), (3, 0, 1, 0), (4, 0, 1, 1), (5, 0, 1, 2)))
+        #list_difference = [item for item in list1 if item not in list2]
+        assert path == expected_path
+        print(path)
+
+    def run_maze_2(self):
+        graph_manager = GraphManager((8, 8, 6))
+        path_manager = PathManager(graph_manager)
+        path_manager.set_all_busy(100)
+        maze_path = list(((0, 1, 1, 0), (1, 1, 0, 0), (2, 1, 0, 0), (3, 0, 0, 0),
+                         (4, 0, 1, 0), (5, 0, 1, 1), (6, 0, 1, 2)))
+        path_manager.remove_busy(maze_path)
+        from_point = Point3D(1, 1, 0)
+        to_point = Point3D(0, 1, 2)
+        path = path_manager.get_path(from_point, to_point, True)
+        expected_path = list(((0, 1, 1, 0), (1, 1, 0, 0), (2, 1, 0, 0),
+                             (3, 0, 0, 0), (4, 0, 1, 0), (5, 0, 1, 1), (6, 0, 1, 2)))
+        #list_difference = [item for item in list1 if item not in list2]
+        assert path == expected_path
+        print(path)
+        path = path_manager.get_path(from_point, to_point, False)
+        assert path == False
+        print(path)
+
+    def run_maze_4(self):
+        graph_manager = GraphManager((8, 8, 6))
+        path_manager = PathManager(graph_manager)
+        path_manager.set_all_busy(100)
+        maze_path = list(((0, 1, 1, 0), (1, 1, 0, 0), (2, 1, 0, 0), (3, 1, 0, 0), (4, 1, 0, 0), (5, 1, 0, 0), (6, 1, 0, 0), (7, 1, 0, 0), (8, 0, 0, 0),
+                         (9, 0, 1, 0), (10, 0, 1, 1), (11, 0, 1, 2)))
+        path_manager.remove_busy(maze_path)
+        from_point = Point3D(1, 1, 0)
+        to_point = Point3D(0, 1, 2)
+        path = path_manager.get_path(from_point, to_point, True)
+        assert path == False
+        print(path)
+        path = path_manager.get_path(from_point, to_point, False)
+        assert path == False
+        print(path)
+
+    def run_maze_5(self):
+        graph_manager = GraphManager((8, 8, 6))
+        path_manager = PathManager(graph_manager)
+        path_manager.set_all_busy(100)
+        maze_path = list(((0, 1, 1, 0), (1, 1, 0, 0), (2, 1, 0, 0), (3, 1, 0, 0), (4, 1, 0, 0), (5, 1, 0, 0), (6, 1, 0, 0), (7, 0, 0, 0),
+                         (8, 0, 1, 0), (9, 0, 1, 1), (10, 0, 1, 2)))
+        path_manager.remove_busy(maze_path)
+        from_point = Point3D(1, 1, 0)
+        to_point = Point3D(0, 1, 2)
+        path = path_manager.get_path(from_point, to_point, True)
+        expected_path = list(((0, 1, 1, 0), (1, 1, 0, 0), (2, 1, 0, 0), (3, 1, 0, 0), (4, 1, 0, 0), (5, 1, 0, 0), (6, 1, 0, 0), (7, 0, 0, 0),
+                              (8, 0, 1, 0), (9, 0, 1, 1), (10, 0, 1, 2)))
+        #list_difference = [item for item in list1 if item not in list2]
+        assert path == expected_path
+        print(path)
+        path = path_manager.get_path(from_point, to_point, False)
+        assert path == False
+        print(path)
+
+    def run_maze_3(self):
+        graph_manager = GraphManager((8, 8, 6))
+        path_manager = PathManager(graph_manager)
+        path_manager.set_all_busy(100)
+        maze_path = list(((1, 1, 0, 0), (2, 0, 0, 0),
+                         (3, 0, 1, 0), (4, 0, 1, 1), (5, 0, 1, 2)))
+        path_manager.remove_busy(maze_path)
+        from_point = Point3D(1, 1, 0)
+        to_point = Point3D(0, 1, 2)
+        path = path_manager.get_path(from_point, to_point, True)
+        expected_path = list(((0, 1, 1, 0), (1, 1, 0, 0),
+                             (2, 0, 0, 0), (3, 0, 1, 0), (4, 0, 1, 1), (5, 0, 1, 2)))
+        #list_difference = [item for item in list1 if item not in list2]
+        assert path == expected_path
+        print(path)
+        path = path_manager.get_path(from_point, to_point, False)
+        expected_path = list(((0, 1, 1, 0), (1, 1, 0, 0),
+                             (2, 0, 0, 0), (3, 0, 1, 0), (4, 0, 1, 1), (5, 0, 1, 2)))
+        #list_difference = [item for item in list1 if item not in list2]
+        assert path == expected_path
+        print(path)
+
+
+test_manager = TestManager()
+# test_manager.run_maze()
+# test_manager.run_maze_2()
+# test_manager.run_maze_3()
+# test_manager.run_maze_4()
+test_manager.run_cases(40, 1000)
+# run_cases(200, 1)
