@@ -4,7 +4,7 @@ import algorithm_1.test_function
 
 # ---------------------------------define the world---------------------------------------
 
-world = World(600,800,800)
+#world = World(600,800,800)
 
 # ---------------------------------define the agents pos--------------------------------------
 #agents_pos = test_function.random_inputs(6,8,8,50)
@@ -46,4 +46,6 @@ else:
     print("their are conflictssssssssssssssssss")"""
 
 
-algorithm_1.test_function.main(world)
+
+if __name__ == '__main__':
+    algorithm_1.test_function.run_random_cases(100, 100, 100, 0.25, 4, 1, 100, 1)

@@ -1,5 +1,5 @@
 from tkinter import *
-from Vialization import *
+#from show_paths_step_by_step.Vialization import *
 import test
 import show_paths.Platform as p
 from PIL import Image, ImageTk
