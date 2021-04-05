@@ -1,80 +1,124 @@
 from tkinter import *
+import tkinter as tk
+from tkinter import ttk
 #from show_paths_step_by_step.Vialization import *
 import test
 import show_paths.Platform as p
-from PIL import Image, ImageTk
+import test_dashboard as test
 
-class Dashboard(Frame):
-    def __init__(self, parent):
-        Frame.__init__(self, parent)
 
-        # create a prompt, an input box, an output label,
-        # and a button to do the computation
-        # self.prompt = tk.Label(self, text="Enter a number:", anchor="w")
-        # self.entry = tk.Entry(self)
-        self.title = Label(self, text = "\nWelcome to Multy Agent Pathfinding Project\n", font = "none 26 bold").pack()
-        self.lbl1 = Label(self, text="Run 1000 random cases with the option to set all sizes and run the test and see the result on the screen.", font = "none 16")
-        self.btn1 = Button(self, text="run", command = self.btn1_handler, font = "none 16")
-        self.lbl2 = Label(self, text="Running of a comparison of the paths with collisions v.s paths without collisions, with a table of the description of the result and some deviation per drone", font = "none 16")
-        self.btn2 = Button(self, text="run", command=self.btn2_handler, font = "none 16")
-        self.lbl3 = Label(self, text="See the tracks in the company's visualization code", font = "none 16")
-        self.btn3 = Button(self, text="run", command=self.btn3_handler, font = "none 16")
-        self.lbl4 = Label(self, text="The vitalization screen that Yehudit made, which is seen in each unit of time for each skimmer current and previous point", font = "none 16")
-        self.btn4 = Button(self, text="run", command=self.btn1_handler, font = "none 16")
-        self.lbl5 = Label(self, text="validation screen When you press the button another screen opens where there are a lot of buttons, each button shows a different validation test", font = "none 16")
-        self.btn5 = Button(self, text="run", command=self.btn1_handler, font = "none 16")
+def btn1_handler(root):
 
-        self.lbl1.pack()
-        self.btn1.pack()
-        self.lbl2.pack()
-        self.btn2.pack()
-        self.lbl3.pack()
-        self.btn3.pack()
-        self.lbl4.pack()
-        self.btn4.pack()
-        self.lbl5.pack()
-        self.btn5.pack()
+    test_results = test.run_1000_cases()
 
-    def btn1_handler(self):
-        test_results = test.run_1000_cases()
+    window = Tk()
+    window.title("run 1000 cases")
 
-        window = Tk()
-        window.title("run 1000 cases")
+    h = Scrollbar(window, orient=HORIZONTAL)
+    h.pack(fill=X, side=BOTTOM, expand=FALSE)
 
-        h = Scrollbar(window, orient=HORIZONTAL)
-        h.pack(fill=X, side=BOTTOM, expand=FALSE)
+    v = Scrollbar(window, orient=VERTICAL)
+    v.pack(fill = Y, side = RIGHT, expand = FALSE)
 
-        v = Scrollbar(window, orient=VERTICAL)
-        v.pack(fill = Y, side = RIGHT, expand = FALSE)
+    canvas = Canvas(window, bd=0, highlightthickness=0, yscrollcommand=v.set, xscrollcommand=h.set)
+    canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
 
-        canvas = Canvas(window, bd=0, highlightthickness=0, yscrollcommand=v.set, xscrollcommand=h.set)
-        canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
+    t = Text(canvas, xscrollcommand=h.set, yscrollcommand=v.set)
+    t.insert(END, test_results)
+    t.pack(side = LEFT, fill = BOTH, expand = TRUE)
 
-        t = Text(canvas, xscrollcommand=h.set, yscrollcommand=v.set)
-        t.insert(END, test_results)
-        t.pack(side = LEFT, fill = BOTH, expand = TRUE)
+    h.config(command=canvas.xview)
+    v.config(command=canvas.yview)
 
-        h.config(command=canvas.xview)
-        v.config(command=canvas.yview)
+    window.mainloop()
+    return
+def btn2_handler():
+    test.draw_paths_step_by_step()
+    return
+def btn3_handler():
+    p.main()
+    return
+def run_tests_btn():
+    num_cases = int(root.num_of_cases_entry.get())
+    num_agents = int(root.num_of_drones_entry.get())
+    width = int(root.width_entry.get())
+    height = int(root.height_entry.get())
+    length = int(root.length_entry.get())
+    test.run_algorithm_1(height, width, length, 0.25, 2, num_cases, num_agents)
+    return
+def run_tests():
+    root.run_tests_win = tk.Toplevel(root)
+    root.run_tests_win.title("run tests")
+    root.canvas_run_tests_win = tk.Canvas(root.run_tests_win)
 
-        window.mainloop()
-        return
+    title_lbl = ttk.Label(root.run_tests_win, text="to run the tests, fill the following:", font = "none 10 bold")
+    title_lbl.grid(column=0, row=0, padx=20, pady=5)
 
-    def btn2_handler(self):
-        test.draw_paths_step_by_step()
-        return
+    num_of_cases_lbl = ttk.Label(root.run_tests_win, text="how many cases would you like to run?")
+    num_of_cases_lbl.grid(column=0, row=1, padx=20, pady=5)
 
-    def btn3_handler(self):
-        p.main()
-        return
+    num_of_cases_entry = tk.IntVar()
+    root.num_of_cases_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=num_of_cases_entry)
+    root.num_of_cases_entry.grid(column=1, row=1, padx=20, pady=5)
 
-# if this is run as a program (versus being imported),
-# create a root window and an instance of our example,
-# then start the event loop
+    num_of_drones_lbl = ttk.Label(root.run_tests_win, text="for how many drones would you like to run the cases?")
+    num_of_drones_lbl.grid(column=0, row=2, padx=20, pady=5)
 
-if __name__ == "__main__":
-    root = Tk()
-    root.title("pathfinding")
-    root.state("zoomed")
-    Dashboard(root).pack(fill="both", expand=True)
-    root.mainloop()
+    num_of_drones_entry = tk.IntVar()
+    root.num_of_drones_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=num_of_drones_entry)
+    root.num_of_drones_entry.grid(column=1, row=2, padx=20, pady=5)
+
+    width_lbl = ttk.Label(root.run_tests_win, text="what is the width(x coordinate) size of the world (in meters)?")
+    width_lbl.grid(column=0, row=3, padx=20, pady=5)
+
+    width_entry = tk.IntVar()
+    root.width_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=width_entry)
+    root.width_entry.grid(column=1, row=3, padx=20, pady=5)
+
+    height_lbl = ttk.Label(root.run_tests_win, text="what is the height(y coordinate) size of the world (in meters)?")
+    height_lbl.grid(column=0, row=4, padx=20, pady=5)
+
+    height_entry = tk.IntVar()
+    root.height_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=height_entry)
+    root.height_entry.grid(column=1, row=4, padx=20, pady=5)
+
+    length_lbl = ttk.Label(root.run_tests_win, text="what is the length(z coordinate) size of the world (in meters)?")
+    length_lbl.grid(column=0, row=5, padx=20, pady=5)
+
+    length_entry = tk.IntVar()
+    root.length_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=length_entry)
+    root.length_entry.grid(column=1, row=5, padx=20, pady=5)
+
+
+
+
+    # choose file button
+    run_btn = tk.Button(root.run_tests_win, text="run tests",command=run_tests_btn)
+    run_btn.grid(column=0, row=6, padx=20, pady=10)
+
+    # Save button
+    # save_button = tk.Button(root.add_quadcopter_window, text=SAVE_TEXT, bg=BUTTON_COLOR, command=close_canvas)
+    # save_button.grid(column=ZERO, row=FOUR)
+    # return
+
+
+root = tk.Toplevel()
+root.title("pathfinding")
+root.state("zoomed")
+
+title = Label(root, text = "\nWelcome to Multy Agent Pathfinding Project\n", font = "none 26 bold").pack()
+lbl1 = Label(root, text="Run Tests", font = "none 16")
+btn1 = Button(root, text="run", command = run_tests, font = "none 16")
+lbl2 = Label(root, text="Show Paths Step by Step", font = "none 16")
+btn2 = Button(root, text="run", command=btn2_handler, font = "none 16")
+lbl3 = Label(root, text="Simulate Paths in 3D Graph", font = "none 16")
+btn3 = Button(root, text="run", command=btn3_handler, font = "none 16")
+
+lbl1.pack()
+btn1.pack()
+lbl2.pack()
+btn2.pack()
+lbl3.pack()
+btn3.pack()
+
+root.mainloop()
