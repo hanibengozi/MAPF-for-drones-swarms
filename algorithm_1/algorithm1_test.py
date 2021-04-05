@@ -48,4 +48,4 @@ else:
 
 
 if __name__ == '__main__':
-    algorithm_1.test_function.run_random_cases(100, 100, 100, 0.25, 4, 1, 100, 1)
+    algorithm_1.test_function.run_random_cases(100, 100, 100, 0.25, 4, 1, 100)

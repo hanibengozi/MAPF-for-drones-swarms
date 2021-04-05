@@ -1,14 +1,15 @@
 import numpy as np
 from algorithm_1.drone import *
+import math
 
 class World:
     def __init__(self, height, width, length, agent_radius, security_distance):
         self.height = height
         self.width = width
         self.length = length
-        self.num_floors = int(height / (agent_radius * 2 + 2 * security_distance))
-        self.num_rows = int(length / (agent_radius * 2 + 2 * security_distance))         # length
-        self.num_cols = int(width / (agent_radius * 2 + 2 * security_distance))          # width
+        self.num_floors = math.ceil(height / (agent_radius * 2 + security_distance))
+        self.num_rows = math.ceil(length / (agent_radius * 2 + security_distance))         # length
+        self.num_cols = math.ceil(width / (agent_radius * 2 + security_distance))          # width
         self.agents = []                              # list of agent object
 
     #the functuon get list of agents position(start & end), end add them to world

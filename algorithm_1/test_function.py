@@ -125,6 +125,7 @@ def run_random_cases(height, width, length, agent_radius, security_distance, num
     for i in range(num_cases):
         world = World(height, width, length, agent_radius, security_distance)
         agents_pos = random_inputs(world.num_floors, world.num_rows, world.num_cols, num_agents)
+        print(world.num_floors, world.num_rows, world.num_cols)
         world.add_agents(agents_pos)                # add the agents to world
         agents = world.get_agents()
         paths, agents_without_solution = search.path_finding(agents, world)  # get the paths for the agents
@@ -173,3 +174,4 @@ def run_specific_case(height, width, length, agent_radius, security_distance, ag
     if save_path:                                   # in case we want to save this paths to jason file
         with open('../jason_paths/paths.txt', 'w') as json_file:
             json.dump(paths, json_file)
+    return paths
