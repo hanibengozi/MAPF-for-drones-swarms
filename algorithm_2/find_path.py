@@ -132,6 +132,7 @@ class GraphManager:
 class Agent:
     def __init__(self, id, from_point, to_point, path_manager):
         self.id = id
+        self.move_fixed_algo = False
         self.path_manager = path_manager
         self.from_point = from_point
         self.to_point = to_point
@@ -154,6 +155,11 @@ class AgentManager:
 
     def get_agents_path_list(self):
         self.init_agents_path()
+
+        def agent_order_key(a):
+            return a.id
+
+        self.agents.sort(key=agent_order_key, reverse=False)
         path = list()
         for a in self.agents:
             # print("path", a.path)
@@ -174,11 +180,15 @@ class AgentManager:
             self.path_error_counter += 1
 
     def build_fixed_places(self):
-        points = list(map(lambda a: (a.id, a.to_point), self.agents))
-        self.path_manager.build_fixed_places(points)
+        to_points = list(map(lambda a: (a.id, a.to_point), self.agents))
+        from_points = list(map(lambda a: (a.id, a.from_point), self.agents))
+        self.path_manager.build_fixed_places(to_points, from_points)
 
     def init_agent_path_algo_2(self, a):
+        a.move_fixed_algo = True
         a.path = self.path_manager.get_path(a.from_point, a.to_point, False, 0, a.id)
+
+    def resolve_agent_path_algo_2(self, a):
         if a.path != False:
             if not self.resolve_path_fixed_collision(a.path, a.id):
                 self.cannot_move_fixed_error_counter += 1
@@ -193,8 +203,9 @@ class AgentManager:
 
         # order by path desc
         self.agents.sort(key=agent_order_key, reverse=True)
+        # points = list(a.from_point for a in self.agents)
+        # self.path_manager.set_first_points_busy(points)
         self.build_fixed_places()
-
         for a in self.agents:
             if a.path != False and len(a.path) > 0:
                 self.path_manager.update_busy(a.path)
@@ -208,12 +219,15 @@ class AgentManager:
                     a.to_point, a.path)
 
         # update fixed agents collision
-        '''
-        need to fix bug before using
 
+        # need to fix bug before using
+        '''
         for a in self.agents:
             if a.path == False:
                 self.init_agent_path_algo_2(a)
+        for a in self.agents:
+            if a.path != False and a.move_fixed_algo == True:
+                self.resolve_agent_path_algo_2(a)
                 self.path_manager.update_busy(a.path)
                 self.path_manager.update_fixed_places_arrived_time(a.to_point, a.path)
         '''
@@ -287,6 +301,9 @@ class PathManager:
         self.points_manager = PointsManager(graph_manager)
         self.graph_manager = graph_manager
 
+    def set_first_points_busy(self, points):
+        self.points_manager.set_first_points_busy(points)
+
     def update_fixed_places_arrived_time(self, fixed_point, path):
         if path != False:
             self.points_manager.update_fixed_places_arrived_time(
@@ -298,8 +315,8 @@ class PathManager:
     def get_collision_fixed_point(self, point, time, agent_id):
         return self.points_manager.get_collision_fixed_point(point, time, agent_id)
 
-    def build_fixed_places(self, points):
-        self.points_manager.build_fixed_places(points)
+    def build_fixed_places(self, to_points, from_points):
+        self.points_manager.build_fixed_places(to_points, from_points)
 
     def random_point(self):
         return self.graph_manager.random_point()
@@ -359,6 +376,10 @@ class PathManager:
 
             steps_filtered = list()
             for s in steps:
+
+                if self.points_manager.is_first_point_busy(time + 1, s.to_tuple(), agent_id):
+                    continue
+
                 if check_fixed_collision:
                     if not can_stay:
                         if s.to_tuple() in visited_points:
@@ -404,6 +425,7 @@ class PointsManager:
     def __init__(self, graph_manager):
         self.graph_manager = graph_manager
         self.time_unit_busy = set()
+        self.from_points = {}
         self.fixed_points = {}
         self.fixed_around_points = {}
 
@@ -422,9 +444,11 @@ class PointsManager:
                     fixed_point = p
         return fixed_point
 
-    def build_fixed_places(self, points):
+    def build_fixed_places(self, points, from_points):
         # TODO important add that if a fixed point have shared around points with other fixed, then keep the first or who have the less
         # check how to do all permutations that everyone have at least 3 places
+        for p in from_points:
+            self.from_points[p[1].to_tuple()] = p[0]
         list_of_fixed = list()
         fixed_points = set(p[1].to_tuple() for p in points)
         for fp in points:
@@ -477,20 +501,34 @@ class PointsManager:
                         time_point_vector = (t, x, y, z)
                         self.time_unit_busy.add(time_point_vector)
 
+    def set_first_points_busy(self, points):
+        for p in points:
+            time_point_vector = (0, p.x, p.y, p.z)
+            self.time_unit_busy.add(time_point_vector)
+
     def update_busy(self, path):
         if (path is not False):
             for i in range(0, len(path)):
                 # add time_unit_busy in the fixed around fields
                 self.time_unit_busy.add(path[i])
+                '''
                 if i > 0:
                     time_point_vector = (
-                        path[i][0], path[i - 1][1], path[i - 1][2], path[i - 1][3])
+                        path[i][0], path[i-1][1], path[i-1][2], path[i-1][3])
                     self.time_unit_busy.add(time_point_vector)
+                    '''
             last_time = path[len(path) - 1][0]
             for i in range(1, 3):
                 time_point_vector = (
                     last_time + i, path[last_time][1], path[last_time][2], path[last_time][3])
                 self.time_unit_busy.add(time_point_vector)
+
+    def is_first_point_busy(self, time, point, agent_id):
+        if time == 1:
+            if point in self.from_points:
+                if self.from_points[point] != agent_id:
+                    return True
+        return False
 
     def is_fixed_point_busy(self, time, point, agent_id):
         if point in self.fixed_points:
@@ -500,6 +538,16 @@ class PointsManager:
         return False
 
     def is_time_unit_busy(self, time_unit_point):
+        if time_unit_point[0] > 0:
+            prev_time = (time_unit_point[0] - 1, time_unit_point[1], time_unit_point[2], time_unit_point[3])
+
+            if prev_time in self.time_unit_busy:
+                return True
+
+        next_time = (time_unit_point[0] + 1, time_unit_point[1], time_unit_point[2], time_unit_point[3])
+        if next_time in self.time_unit_busy:
+            return True
+
         return time_unit_point in self.time_unit_busy
 
 
@@ -605,7 +653,7 @@ class TestManager:
         # return (sum_path_length - sum_original_path_length)/count_path
         return max_path_length - max_original_path_length
 
-    def check_collision(self, p_list):
+    def check_collision(self, p_list, points_manager):
         path_list = deepcopy(p_list)
         max_path_length = max(
             len(x) if x is not False else 0 for x in path_list)
@@ -628,17 +676,28 @@ class TestManager:
             for i in range(0, max_path_length):
                 if path == False:
                     continue
-                # assert (path[i] in time_units) == False
+                collision_agent = False
                 if path[i] in time_units and time_units[path[i]] != path_id:
-                    print("time_units[path[i]]  -1 ]:", time_units[path[i]] - 1)
+                    collision_agent = time_units[path[i]]
+                if (path[i][0] - 1, path[i][1], path[i][2], path[i][3]) in time_units and time_units[
+                    (path[i][0] - 1, path[i][1], path[i][2], path[i][3])] != path_id:
+                    collision_agent = time_units[(path[i][0] - 1, path[i][1], path[i][2], path[i][3])]
+                if (path[i][0] + 1, path[i][1], path[i][2], path[i][3]) in time_units and time_units[
+                    path[i][0] + 1, path[i][1], path[i][2], path[i][3]] != path_id:
+                    collision_agent = time_units[(path[i][0] + 1, path[i][1], path[i][2], path[i][3])]
+                # assert (path[i] in time_units) == False
+                if collision_agent is not False:
+                    print("time_units[path[i]]  -1 ]:", collision_agent)
                     print("path:", path)
-                    print("path collision:", path_list[time_units[path[i]] - 1])
+                    print("path collision:", path_list[collision_agent])
                     print("path[i]:", path[i])
                     collision += 1
                 else:
+                    '''
                     if i > 0:
-                        time_units[(path[i][0], path[i - 1][1],
-                                    path[i - 1][2], path[i - 1][3])] = path_id
+                        time_units[(path[i][0], path[i-1][1],
+                                    path[i-1][2], path[i-1][3])] = path_id
+                    '''
                     time_units[path[i]] = path_id
             if collision > 0:
                 collision_counter += collision
@@ -651,7 +710,7 @@ class TestManager:
         random_points = agent_manager.get_random_agents(drones_count)
         agent_manager.create_agents(random_points)
         path_list = agent_manager.get_agents_path_list()
-        print(path_list)
+        # print(path_list)
         return path_list
 
     def run_cases(self, drones_count, cases_num):
@@ -661,7 +720,7 @@ class TestManager:
         total_deviation = 0
         total_collision = 0
         case_success_move = 0
-        graph_manager = GraphManager((10, 10, 8))
+        graph_manager = GraphManager((16, 16, 15))
         for j in range(0, cases_num):
             # print("j:", j)
             path_manager = PathManager(graph_manager)
@@ -669,7 +728,7 @@ class TestManager:
             before_time = datetime.now()
             # print("before_time:", before_time)
             path_list = self.run_case(agent_manager, drones_count)
-            total_collision += self.check_collision(path_list)
+            total_collision += self.check_collision(path_list, path_manager.points_manager)
             total_deviation += self.check_path_deviation(agent_manager.agents)
             after_time = datetime.now()
             # print("after_time:", after_time)
@@ -694,5 +753,5 @@ test_manager = TestManager()
 # test_manager.run_maze_2()
 # test_manager.run_maze_3()
 # test_manager.run_maze_4()
-test_manager.run_cases(50, 1)
+test_manager.run_cases(50, 100)
 # run_cases(200, 1)
