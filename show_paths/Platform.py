@@ -234,7 +234,7 @@ def calc_paths():
     del_lab_label()
 
     # --------- real date received from user ----------------
-    world = World(600, 800, 800)
+    world = World(100, 100, 100, 0.25, 4)
     print("the convert data\n", input_data)
     world.add_agents(input_data)  # add the agents to world
     agents = world.get_agents()
