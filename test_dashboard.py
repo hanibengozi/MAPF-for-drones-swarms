@@ -1,4 +1,4 @@
-import algorithm_1.algorithm1_test
+import algorithm_1.algoritm1_test
 
 
 def run_algorithm_1(height, width, length, agent_radius, security_distance, num_cases, num_agents, save_path=0):

@@ -235,26 +235,19 @@ def calc_paths():
 
     # --------- real date received from user ----------------
     world = World(100, 100, 100, 0.25, 4)
-    print("the convert data\n", input_data)
     world.add_agents(input_data)  # add the agents to world
     agents = world.get_agents()
     paths, agents_without_solution = search.path_finding(agents, world)  # get the paths for the agents
     print(paths)
-    # paths = path_equalize(agents, paths)
     paths_with_time = {}
     for agent in paths:
         paths_with_time[agent] = []
         for i, step in enumerate(paths[agent]):
             paths_with_time[agent].append((i,step[0], step[1], step[2]))
-    print(paths_with_time)
-    print(paths_with_time)
     # -------------------------------------------------------
 
     raw_data = paths_with_time
 
-    """
-    HERE YOU NEED TO SEND YOU REAL DATA!!
-    """
     draw_graph(raw_data)
 
     add_graph_label()
@@ -332,27 +325,6 @@ def main():
     root.mainloop()
     return
 
-# ======================================================================
-# the method get list of agents and their paths, and make all of the paths in the same length, by duplicate the last step
-def path_equalize(agents, paths, max_pathlen = -1):
-
-    if(max_pathlen < 0):
-        max_pathlen = get_max_pathlen(paths)
-
-    for agent in paths:
-        path = paths[agent]
-        last_step = path[-1]
-        for step in range(len(path), max_pathlen):
-            path.append( (last_step[0], last_step[1], last_step[2] ) )
-        paths[agent] = path
-    return paths
-
-def get_max_pathlen(paths):
-    max_path_len = 0
-    for agent in paths:
-        if len(paths[agent]) > max_path_len:
-            max_path_len = len(paths[agent])
-    return max_path_len
 
 def select_file():
     filetypes = (
