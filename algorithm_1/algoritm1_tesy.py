@@ -173,3 +173,8 @@ def run_specific_case(height, width, length, agent_radius, security_distance, ag
     if save_path:                                   # in case we want to save this paths to jason file
         with open('../jason_paths/paths.txt', 'w') as json_file:
             json.dump(paths, json_file)
+    print(paths)
+
+
+if __name__ == '__main__':
+    run_random_cases(100, 100, 100, 0.25, 4, 1, 100)
