@@ -175,6 +175,14 @@ def run_specific_case(height, width, length, agent_radius, security_distance, ag
             json.dump(paths, json_file)
     print(paths)
 
+def run_one_case(height, width, length, agent_radius, security_distance, agents_pos, save_path=0):
+
+    world = World(height, width, length, agent_radius, security_distance)
+    world.add_agents(agents_pos)                                          # add the agents to world
+    agents = world.get_agents()
+    paths, agents_without_solution = search.path_finding(agents, world)   # get the paths for the agents
+    return paths, agents_without_solution
+
 
 if __name__ == '__main__':
-    run_random_cases(100, 100, 100, 0.25, 4, 1, 100)
+    run_random_cases(100, 100, 100, 0.25, 4, 1, 300)
