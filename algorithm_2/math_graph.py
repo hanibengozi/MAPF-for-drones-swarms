@@ -46,6 +46,19 @@ class Point3D(Point):
     def to_array(self):
         return [self.x, self.y, self.z]
 
+    def to_tuple(self):
+        return (self.x, self.y, self.z)
+
+    @staticmethod
+    def get_point_time_tuple(time_tuple):
+        return Point3D(time_tuple[1], time_tuple[2], time_tuple[3])
+
+    def __str__(self):
+        return str(self.to_tuple())
+
+    def __hash__(self):
+        return hash(str(self))
+
 
 class TwoDLine:
     def __init__(self, from_point: Point, to_point: Point):
@@ -66,14 +79,14 @@ class TwoDLine:
         return math.dist(self.from_point.to_array(), self.to_point.to_array())
 
     def slope(self):
-        xDiff = (self.to_point.x-self.from_point.x)
+        xDiff = (self.to_point.x - self.from_point.x)
         m = math.inf if xDiff == 0 else (
-            self.to_point.y-self.from_point.y)/xDiff
+                                                self.to_point.y - self.from_point.y) / xDiff
         return m
 
     def get_Y_interceptor(self):
         m = self.slope()
-        b = self.to_point.y-(m*self.to_point.x)
+        b = self.to_point.y - (m * self.to_point.x)
         return b
 
 
@@ -92,11 +105,11 @@ class TwoDGraph:
 
         if not line2d.parrallel_to_Y and abs(line2d.m) < 1:
             print("loop x")
-            #min_X_from_round_y = x = ((int(line2d.min_Y)-line2d.b) / line2d.m) if line2d.m != 0 else 0
-            #max_X_from_round_y = x = ((int(line2d.max_Y)-line2d.b) / line2d.m) if line2d.m != 0 else 0
-            #min_X = min(min_X_from_round_y, min_X, max_X_from_round_y)
+            # min_X_from_round_y = x = ((int(line2d.min_Y)-line2d.b) / line2d.m) if line2d.m != 0 else 0
+            # max_X_from_round_y = x = ((int(line2d.max_Y)-line2d.b) / line2d.m) if line2d.m != 0 else 0
+            # min_X = min(min_X_from_round_y, min_X, max_X_from_round_y)
             print("max_X", line2d.max_X)
-            #max_X = max(min_X_from_round_y, max_X, max_X_from_round_y)
+            # max_X = max(min_X_from_round_y, max_X, max_X_from_round_y)
             print("max_X", line2d.max_X)
             for x in range(int(line2d.min_X), int(line2d.max_X) + 2):
                 print("x", x)
@@ -112,18 +125,18 @@ class TwoDGraph:
                 print('find y by x', 'x:', x, 'y:', y)
         if not line2d.parrallel_to_X and (abs(line2d.m) >= 1 or line2d.m == 0):
             print("loop y")
-            #min_Y_from_round_x = (line2d.m * int(line2d.min_X)) + line2d.b
-            #max_Y_from_round_x = (line2d.m * int(line2d.max_X)) + line2d.b
-            #min_Y = min(min_Y_from_round_x, min_Y, max_Y_from_round_x)
+            # min_Y_from_round_x = (line2d.m * int(line2d.min_X)) + line2d.b
+            # max_Y_from_round_x = (line2d.m * int(line2d.max_X)) + line2d.b
+            # min_Y = min(min_Y_from_round_x, min_Y, max_Y_from_round_x)
             print(line2d.min_Y)
-            #max_Y = max(min_Y_from_round_x, max_Y, max_Y_from_round_x)
+            # max_Y = max(min_Y_from_round_x, max_Y, max_Y_from_round_x)
             print(line2d.max_Y)
             for y in range(int(line2d.min_Y), int(line2d.max_Y + 2)):
 
                 if line2d.parrallel_to_Y:
                     x = from_point.x
                 else:
-                    x = ((y-line2d.b) / line2d.m) if line2d.m != 0 else 0
+                    x = ((y - line2d.b) / line2d.m) if line2d.m != 0 else 0
                 if y != int(line2d.max_Y) + 1:
                     points.add(Point(int(x), int(y)))
                 if y != int(line2d.min_Y):
@@ -209,7 +222,7 @@ class TwoDGraph:
         radius = math.dist(from_point.to_array(), to_point.to_array())
         print("radius", radius)
         angle_of_line = math.degrees(math.atan2(
-            to_point.y-from_point.y, to_point.x-from_point.x))
+            to_point.y - from_point.y, to_point.x - from_point.x))
         print("angle", angle)
         angle_to_move = angle_of_line + angle
         # center of circle, angle in degree and radius of circle
@@ -217,7 +230,7 @@ class TwoDGraph:
         angle_to_move_radians = math.radians(angle_to_move)
         x = center.x + (radius * math.cos(angle_to_move_radians))
         y = center.y + (radius * math.sin(angle_to_move_radians))
-        print("new radius", math.dist(from_point.to_array(), [x,y]))
+        print("new radius", math.dist(from_point.to_array(), [x, y]))
         print("x", x, "y ", y)
         return Point(x, y)
 
@@ -226,15 +239,86 @@ class TwoDGraph:
         all_points = []
         for p in points:
             all_points.extend(self.get_graph_points_in_radius(p, radius))
-        #print("len", len(all_points))
+        # print("len", len(all_points))
         all_points = list(dict.fromkeys(all_points))
-        #print("len", len(all_points))
+        # print("len", len(all_points))
         return all_points
 
 
 class ThreeDGraph(TwoDGraph):
     def __init__(self):
         TwoDGraph.__init__(self)
+
+    # Python3 code for generating points on a 3-D line
+    # using Bresenham's Algorithm
+
+    def find_all_points_between2_3d_points(self, x1, y1, z1, x2, y2, z2):
+        ListOfPoints = []
+        ListOfPoints.append((x1, y1, z1))
+        dx = abs(x2 - x1)
+        dy = abs(y2 - y1)
+        dz = abs(z2 - z1)
+        if (x2 > x1):
+            xs = 1
+        else:
+            xs = -1
+        if (y2 > y1):
+            ys = 1
+        else:
+            ys = -1
+        if (z2 > z1):
+            zs = 1
+        else:
+            zs = -1
+
+        # Driving axis is X-axis"
+        if (dx >= dy and dx >= dz):
+            p1 = 2 * dy - dx
+            p2 = 2 * dz - dx
+            while (x1 != x2):
+                x1 += xs
+                if (p1 >= 0):
+                    y1 += ys
+                    p1 -= 2 * dx
+                if (p2 >= 0):
+                    z1 += zs
+                    p2 -= 2 * dx
+                p1 += 2 * dy
+                p2 += 2 * dz
+                ListOfPoints.append((x1, y1, z1))
+
+        # Driving axis is Y-axis"
+        elif (dy >= dx and dy >= dz):
+            p1 = 2 * dx - dy
+            p2 = 2 * dz - dy
+            while (y1 != y2):
+                y1 += ys
+                if (p1 >= 0):
+                    x1 += xs
+                    p1 -= 2 * dy
+                if (p2 >= 0):
+                    z1 += zs
+                    p2 -= 2 * dy
+                p1 += 2 * dx
+                p2 += 2 * dz
+                ListOfPoints.append((x1, y1, z1))
+
+        # Driving axis is Z-axis"
+        else:
+            p1 = 2 * dy - dz
+            p2 = 2 * dx - dz
+            while (z1 != z2):
+                z1 += zs
+                if (p1 >= 0):
+                    y1 += ys
+                    p1 -= 2 * dz
+                if (p2 >= 0):
+                    x1 += xs
+                    p2 -= 2 * dz
+                p1 += 2 * dy
+                p2 += 2 * dx
+                ListOfPoints.append((x1, y1, z1))
+        return ListOfPoints
 
     def get_Z_values_in_radius_of_path(self, from_point: Point3D, to_point: Point3D, radius):
         Z_values = []
@@ -255,6 +339,12 @@ class ThreeDGraph(TwoDGraph):
             for p2d in two_D_points:
                 three_D_points_result.append(Point3D(p2d.x, p2d.y, p3d))
         return three_D_points_result
+
+
+(x1, y1, z1) = (-1, 1, 1)
+(x2, y2, z2) = (5, 3, -1)
+ListOfPoints = ThreeDGraph().find_all_points_between2_3d_points(x1, y1, z1, x2, y2, z2)
+# print(ListOfPoints)
 
 # TODO
 # get next point check if greater that the end point, one function that get the two point

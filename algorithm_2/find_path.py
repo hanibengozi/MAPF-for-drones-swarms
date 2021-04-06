@@ -1,6 +1,6 @@
-import math_graph
+import algorithm_2.math_graph as math_graph
 import random
-from math_graph import Point3D
+from algorithm_2.math_graph import Point3D
 from datetime import datetime
 import math as m
 from copy import deepcopy
