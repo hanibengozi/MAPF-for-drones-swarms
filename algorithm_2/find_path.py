@@ -748,10 +748,10 @@ class TestManager:
         print("case_success_move:", case_success_move)
 
 
-test_manager = TestManager()
+#test_manager = TestManager()
 # test_manager.run_maze()
 # test_manager.run_maze_2()
 # test_manager.run_maze_3()
 # test_manager.run_maze_4()
-test_manager.run_cases(50, 100)
+#test_manager.run_cases(50, 100)
 # run_cases(200, 1)

@@ -115,65 +115,81 @@ def path_equalize(agents, paths, max_pathlen = -1):
         paths[agent] = path
     return paths
 
+# this method get number od casses and agents and size of world, and run the algorithm number of cases for random position
 def run_random_cases(height, width, length, agent_radius, security_distance, num_cases, num_agents, save_path=0):
 
     count = 0
     count_conflicts = 0
     counter_faild = 0
     list_of_faild = []
+    result = ""
+    run_time = 0
 
     for i in range(num_cases):
+
         world = World(height, width, length, agent_radius, security_distance)
         agents_pos = random_inputs(world.num_floors, world.num_rows, world.num_cols, num_agents)
         world.add_agents(agents_pos)                # add the agents to world
         agents = world.get_agents()
         paths, agents_without_solution = search.path_finding(agents, world)  # get the paths for the agents
-        print("--- %s seconds ---" % (time.time() - start_time))
+        run_time = time.time() - start_time
+
         if paths and not agents_without_solution:
             if not check_conflicts(agents, paths):
                 count += 1
-                #path_len_ratio = path_length_ratio(agents, world)
-                #print("the agents pos:\n", agents_pos, "\nthe paths: \n", paths, "\nSucssiedddddddd\n", "path_len_ratio\n", path_len_ratio)
             else:
                 count_conflicts += 1
-                #print("their is a conflictssssssssssssssss\n")
         else:
             counter_faild += 1
             list_of_faild.append(i)
-            print("the algorithem didnt find paths for this agents_pos\n", agents_pos, "the problematic agents is:\n", agents_without_solution)
 
-        print(paths)
-        print("count of sucsses is: ", count, "count of conflictsss: ", count_conflicts, "count of faild: ", counter_faild)
-        print("the number example of faild is : ", list_of_faild)
+    # save results for showing on screen
+    result += "For running " + num_cases + "cases\n"
+    result += " The number of cases the algorithm returned paths without collisions: " + count + "\n"
+    result += "The number of cases the algorithm returned trajectories with collisions: " + count_conflicts + "\n"
+    result += "The number of cases that the algorithm did not find paths: " + counter_faild + "\n"
+    result += "The time of run is: ", + run_time + " " + run_time / num_cases
 
-        if save_path:
-            with open('../jason_paths/paths.txt', 'w') as json_file:
-                json.dump(paths, json_file)
+    #------------------printing-----------------------------------------
+    #print(paths)
+    print(result)
+
+    # in case we want to save this paths in jason file
+    if save_path:
+        with open('../jason_paths/paths.txt', 'w') as json_file:
+            json.dump(paths, json_file)
+
+    return result
 
 def run_specific_case(height, width, length, agent_radius, security_distance, agents_pos, save_path=0):
 
+    result = ""
     world = World(height, width, length, agent_radius, security_distance)
     world.add_agents(agents_pos)                                         # add the agents to world
     agents = world.get_agents()
     paths, agents_without_solution = search.path_finding(agents, world)  # get the paths for the agents
+    result += "this run time of this case is: " + time.time() - start_time
     print("--- %s seconds ---" % (time.time() - start_time))
     if paths and not agents_without_solution:
         if not check_conflicts(agents, paths):
+            result += "This case success!" + "\n"
             print("this case succeeded")
-            # path_len_ratio = path_length_ratio(agents, world)
-            # print("the agents pos:\n", agents_pos, "\nthe paths: \n", paths, "\nSucssiedddddddd\n", "path_len_ratio\n", path_len_ratio)
         else:
+            result += "This case return with conflicts!" + "\n"
             print("this case return with conflicts")
-            # print("their is a conflictssssssssssssssss\n")
     else:
+        result += "The algorithm didnt find paths for this agents_pos!" + "\n"
         print("the algorithem didnt find paths for this agents_pos\n")
 
+    result += "The paths:\n" + paths
     print(paths)
 
-    if save_path:                                   # in case we want to save this paths to jason file
+    # in case we want to save this paths to jason file
+    if save_path:
         with open('../jason_paths/paths.txt', 'w') as json_file:
             json.dump(paths, json_file)
-    print(paths)
+
+    return result
 
 def run_one_case(height, width, length, agent_radius, security_distance, agents_pos, save_path=0):
 
@@ -185,4 +201,4 @@ def run_one_case(height, width, length, agent_radius, security_distance, agents_
 
 
 if __name__ == '__main__':
-    run_random_cases(100, 100, 100, 0.25, 4, 1, 300)
+    run_random_cases(100, 100, 100, 0.25, 4, 1000, 100)
