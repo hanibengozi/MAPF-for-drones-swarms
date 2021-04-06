@@ -199,6 +199,21 @@ def get_path_len(paths):
 
     return len_paths
 
+# this method return the distance between start to goal for each agent
+def get_distance(agents):
+    len_path = {}
+    for agent in agents:
+        len_path[agent] = abs(agent.start_pos[0] - agent.goal_pos[0]) + abs(agent.start_pos[1] - agent.goal_pos[1]) +abs(agent.start_pos[2] - agent.goal_pos[2])
+    return len_path
+
+#this method get dict of path length, and return the max path len
+def get_max_path_len(paths_len):
+    max_pathlen = 0
+    for agent in paths_len:
+        if paths_len[agent] > max_pathlen:
+            max_pathlen = paths_len[agent]
+    return max_pathlen
+
 # this method get list of agents, and sort the array, according to the length of their path with conflicts
 # this method chang the given list of the agents
 def sort_agents(agents, paths_len_with_conflicts):
@@ -215,13 +230,13 @@ def sort_agents(agents, paths_len_with_conflicts):
 
 # the method return true when all the agents arrived to goal, or when the algorithm found paths for anyone who succeeded
 # the method return True, and list of agents that the algorithm cant fount path for them.
-def got_to_goal(agents_list, paths):
+def got_to_goal(agents_list, paths, max_path_len):
 
     agents_without_solution = []
 
     for agent in agents_list:
 
-        if len(paths[agent.id]) > len(agents_list) * 2:  # the len of agent path is too long - infinity loop
+        if len(paths[agent.id]) > max_path_len * 2:  # the len of agent path is too long - infinity loop
             agents_without_solution.append(agent)
 
         # there agent that didnt arrived to goal yet.

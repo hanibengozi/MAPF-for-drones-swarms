@@ -1,6 +1,7 @@
 import algorithm_1.general_functions as general_functions
 from algorithm_1.time_unit import *
 from algorithm_1.step import *
+import math
 from pip._vendor.msgpack.fallback import xrange
 
 # this method find paths for all agents, with conflicts
@@ -30,6 +31,13 @@ def path_finding_with_conflicts(agents):
 
     return paths
 
+# this method return the distance between start to goal for each agent
+def get_distance(agents):
+    len_path = {}
+    for agent in agents:
+        len_path[agent.id] = abs(agent.start_pos[0] - agent.goal_pos[0]) + abs(agent.start_pos[1] - agent.goal_pos[1]) +abs(agent.start_pos[2] - agent.goal_pos[2])
+    return len_path
+
 # this method find paths for all agents without conflicts
 def path_finding(agents, world):
 
@@ -40,8 +48,9 @@ def path_finding(agents, world):
     time_unit = TimeUnit(1, None)                      # Initialize the first time step
 
     # sort the agents according to the length of the paths with conflicts
-    paths_with_conflicts = path_finding_with_conflicts(agents)
-    paths_len_with_conflicts = general_functions.get_path_len(paths_with_conflicts)
+    # get the distance from start to goal for each agent
+    paths_len_with_conflicts = general_functions.get_distance(agents)
+    max_path_len = general_functions.get_max_path_len(paths_len_with_conflicts)
     general_functions.sort_agents(agents, paths_len_with_conflicts)
 
     for agent in agents:                              # initialize the list of current_steps with start pos
@@ -55,7 +64,7 @@ def path_finding(agents, world):
         paths[agent.id] = [agent.start_pos]           # initialize the value of paths dict to the start pos
 
     # -----------------------------stay in loop, until we find path for evrey agent-----------------------------
-    while not general_functions.got_to_goal(agents, paths)[0]:     # loop until all the agents got to goal
+    while not general_functions.got_to_goal(agents, paths, max_path_len)[0]:     # loop until all the agents got to goal
 
         counter = 0
         for agent in agents:                                    # iterate on agents, for each agent find next step.
@@ -70,13 +79,13 @@ def path_finding(agents, world):
                         add = 0
                 if add:
                     current_steps.append(step)
-                print("this agent: ", agent.id, " find next step in time: ", time_unit.time, " the next step is: ", step.step, " is goal: ", step.is_goal, agent.stay_in_place)
+                #print("this agent: ", agent.id, " find next step in time: ", time_unit.time, " the next step is: ", step.step, " is goal: ", step.is_goal, agent.stay_in_place)
                 continue
 
             new_step = general_functions.get_next_step(agent, time_unit, world)   # get next step
 
             if new_step:                                                          # their is next step for this agent
-                print("this agent: ", agent.id, " find next step in time: ", time_unit.time, " the next step is: ", new_step.step, " is goal: ", new_step.is_goal, agent.stay_in_place)
+                #print("this agent: ", agent.id, " find next step in time: ", time_unit.time, " the next step is: ", new_step.step, " is goal: ", new_step.is_goal, agent.stay_in_place)
 
                 update_movment_of_fix(agents, paths, current_steps, time_unit)                   # in case we move fix step, make some updates
                 time_unit.add_current_step(new_step)                              # add this step to current steps
@@ -86,24 +95,24 @@ def path_finding(agents, world):
 
                 if new_step.step == agent.goal_pos:
                     time_unit.add_fix_step(new_step.step)                              # add this step to fix steps
-                    print("agent: ", agent.id, "arrive to goal!")
+                    #print("agent: ", agent.id, "arrive to goal!")
                     counter += 1
 
             else:                                                                 # in case, this agent stuck
-                print("agent: ", agent.id, " stuckkkkkkkkkkkkk!!!!!!!!!!")
+                #print("agent: ", agent.id, " stuckkkkkkkkkkkkk!!!!!!!!!!")
                 return None, None
         # לבדוק האם צריך למיין לפי מי שנשאר הרבה זמן במקום ולמיין
         general_functions.sort_agents_by_time_of_stay_in_place(agents)
         # לשאול את דבורה האם להשאיר במקום זה צריך להיות בעדיפות יותר מאשר סטייה כי אם אין לי אופציות בלי סטייה אז הוא כל הזמן נשאר במקום
         # לטפל בכל האופציות של להוזיז קבוע וכו
-        print("the number of agents that didnt arrived to goal is: ", len(agents) - counter)
+        #print("the number of agents that didnt arrived to goal is: ", len(agents) - counter)
         time_unit = TimeUnit(time_unit.time + 1, time_unit)                       # Advances the steps in one
         time_unit.set_prev_steps(current_steps)                                   # update the prev steps for next time
         time_unit.set_current_steps(current_steps)                                # update the current steps with prev steps for next time
         time_unit.step_in_time_forbidden = time_unit.prev_time_unit.step_in_time_forbidden.copy()
         current_steps = []                                                        # reset the current steps temp for next time
 
-    agents_without_solution = general_functions.got_to_goal(agents, paths)[1]
+    agents_without_solution = general_functions.got_to_goal(agents, paths, max_path_len)[1]
     return paths, agents_without_solution
 
 def update_movment_of_fix(agents, paths, current_steps, time_unit):
