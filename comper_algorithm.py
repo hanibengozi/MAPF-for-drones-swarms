@@ -1,5 +1,5 @@
 import algorithm_1.algoritm1_test
-import algorithm_2.find_path
+import algorithm_2.algorithem2_test
 import time
 import math
 
@@ -44,6 +44,7 @@ def main(num_of_cases, num_of_agents):
         algorithm = ALGORITHM_1, ALGORITHM_2
 
     print("the algorithm with the best run time is: ",algorithm, run_time_1, run_time_2)
+
 if __name__ == '__main__':
     main(1,50)
 

@@ -41,10 +41,8 @@ def btn3_handler():
 def run_tests_btn():
     num_cases = int(root.num_of_cases_entry.get())
     num_agents = int(root.num_of_drones_entry.get())
-    width = int(root.width_entry.get())
-    height = int(root.height_entry.get())
-    length = int(root.length_entry.get())
-    test.run_algorithm_1(height, width, length, 0.25, 2, num_cases, num_agents)
+    alg = root.tkvarq.get()
+    test.run_algorithm_1(100, 100, 100, 0.25, 2, num_cases, num_agents, alg)
     return
 def run_tests():
     root.run_tests_win = tk.Toplevel(root)
@@ -68,38 +66,19 @@ def run_tests():
     root.num_of_drones_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=num_of_drones_entry)
     root.num_of_drones_entry.grid(column=1, row=2, padx=20, pady=5)
 
-    width_lbl = ttk.Label(root.run_tests_win, text="what is the width(x coordinate) size of the world (in meters)?")
-    width_lbl.grid(column=0, row=3, padx=20, pady=5)
+    choose_algo_lbl = ttk.Label(root.run_tests_win, text="in which algorithm would you like to run the cases?")
+    choose_algo_lbl.grid(column=0, row=3, padx=20, pady=5)
 
-    width_entry = tk.IntVar()
-    root.width_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=width_entry)
-    root.width_entry.grid(column=1, row=3, padx=20, pady=5)
+    options = ["algorithm 1", "algorithm 2"]
+    tkvarq = StringVar(root.run_tests_win)
+    tkvarq.set(options[0])
+    choose_algo = OptionMenu(root.run_tests_win, tkvarq, *options)
+    choose_algo.grid(column=1, row=3, padx=20, pady=5)
 
-    height_lbl = ttk.Label(root.run_tests_win, text="what is the height(y coordinate) size of the world (in meters)?")
-    height_lbl.grid(column=0, row=4, padx=20, pady=5)
-
-    height_entry = tk.IntVar()
-    root.height_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=height_entry)
-    root.height_entry.grid(column=1, row=4, padx=20, pady=5)
-
-    length_lbl = ttk.Label(root.run_tests_win, text="what is the length(z coordinate) size of the world (in meters)?")
-    length_lbl.grid(column=0, row=5, padx=20, pady=5)
-
-    length_entry = tk.IntVar()
-    root.length_entry = ttk.Entry(root.run_tests_win, width=10, textvariable=length_entry)
-    root.length_entry.grid(column=1, row=5, padx=20, pady=5)
-
-
-
-
-    # choose file button
+     # choose file button
     run_btn = tk.Button(root.run_tests_win, text="run tests",command=run_tests_btn)
     run_btn.grid(column=0, row=6, padx=20, pady=10)
 
-    # Save button
-    # save_button = tk.Button(root.add_quadcopter_window, text=SAVE_TEXT, bg=BUTTON_COLOR, command=close_canvas)
-    # save_button.grid(column=ZERO, row=FOUR)
-    # return
 
 
 root = tk.Toplevel()
@@ -109,15 +88,11 @@ root.state("zoomed")
 title = Label(root, text = "\nWelcome to Multy Agent Pathfinding Project\n", font = "none 26 bold").pack()
 lbl1 = Label(root, text="Run Tests", font = "none 16")
 btn1 = Button(root, text="run", command = run_tests, font = "none 16")
-#lbl2 = Label(root, text="Show Paths Step by Step", font = "none 16")
-#btn2 = Button(root, text="run", command=btn2_handler, font = "none 16")
 lbl3 = Label(root, text="Simulate Paths in 3D Graph", font = "none 16")
 btn3 = Button(root, text="run", command=btn3_handler, font = "none 16")
 
 lbl1.pack()
 btn1.pack()
-#lbl2.pack()
-#btn2.pack()
 lbl3.pack()
 btn3.pack()
 
