@@ -91,7 +91,7 @@ def path_finding(agents, world):
 
             else:                                                                 # in case, this agent stuck
                 print("agent: ", agent.id, " stuckkkkkkkkkkkkk!!!!!!!!!!")
-                return paths
+                return None, None
         # לבדוק האם צריך למיין לפי מי שנשאר הרבה זמן במקום ולמיין
         general_functions.sort_agents_by_time_of_stay_in_place(agents)
         # לשאול את דבורה האם להשאיר במקום זה צריך להיות בעדיפות יותר מאשר סטייה כי אם אין לי אופציות בלי סטייה אז הוא כל הזמן נשאר במקום
