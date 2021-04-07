@@ -1,4 +1,3 @@
-import numpy as np
 from algorithm_1.drone import *
 import math
 
@@ -8,9 +7,9 @@ class World:
         self.width = width
         self.length = length
         self.num_floors = math.ceil(height / (agent_radius * 2 + security_distance))
-        self.num_rows = math.ceil(length / (agent_radius * 2 + security_distance))         # length
-        self.num_cols = math.ceil(width / (agent_radius * 2 + security_distance))          # width
-        self.agents = []                              # list of agent object
+        self.num_rows = math.ceil(length / (agent_radius * 2 + security_distance))      # length
+        self.num_cols = math.ceil(width / (agent_radius * 2 + security_distance))       # width
+        self.agents = []                                                                # list of agent object
 
     #the functuon get list of agents position(start & end), end add them to world
     def add_agents(self, agents_pos):
@@ -32,8 +31,8 @@ class World:
                     start_pos.append((start_x,start_y, start_z))
                 else:
                     print("start",(start_x,start_y, start_z))
-                    # raise Exception('Failure! their are conflicts in drones start position')
-                    # return False
+                    raise Exception('Failure! their are conflicts in drones start position')
+                    return False
                 if (goal_x,goal_y, goal_z) not in goal_pos:
                     goal_pos.append((goal_x,goal_y, goal_z))
                 else:

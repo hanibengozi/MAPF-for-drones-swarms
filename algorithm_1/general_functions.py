@@ -12,8 +12,8 @@ def get_all_steps(agent, world):
     for coordinate in range(2,-1,-1):
         direction = 1 if agent.current_step[coordinate] < agent.goal_pos[coordinate] else -1  # Sets the direction to the goal, up (=1) or down(=-1)
 
-        with_deviation = 1  # define that this step with deviation from goal
-        without_deviation = 0  # define that this step without deviation
+        with_deviation = 1           # define that this step with deviation from goal
+        without_deviation = 0        # define that this step without deviation
 
         if agent.current_step[coordinate] == agent.goal_pos[coordinate]: # in case this coordinate already in place, both movement are with deviation
             with_deviation = 2
@@ -57,34 +57,30 @@ def get_next_step_with_collision(step, goal):
 # this method  trying to move fix step, in case of succses update that this agent need to return back to goal
 def move_fix_step(step, agent, time_unit, world):
 
-    # 1. למצוא מקום פנוי מאחד השכנים שלו, עבור הצעד הקבוע
     # trying to find free next step, for fix step to move
     fix_step = step.collides_with_fix
     free_step_to_fix_step = None
     fix_agent_goal_pos = fix_step.agent.goal_pos
     if fix_step.step != agent.goal_pos:
-        fix_step.agent.goal_pos = agent.goal_pos                       # to get all steps with deviation according to agent goal
+        fix_step.agent.goal_pos = agent.goal_pos           # to get all steps with deviation according to agent goal
 
-    steps = get_all_steps(fix_step.agent, world)                   # get all steps (nighbors for fix step)
+    steps = get_all_steps(fix_step.agent, world)           # get all steps (nighbors for fix step)
 
     for s in steps:
-        if check_free_step(s, time_unit, time_unit.prev_time_unit.current_steps):    # if the nighbors dont collides with steps in prev time
+        if check_free_step(s, time_unit, time_unit.prev_time_unit.current_steps):  # if the nighbors dont collides with steps in prev time
             if check_free_step(s, time_unit, time_unit.current_steps):
-                if s.collides_with != s.Collision.collides_fix:  # and this step not collides with fix
+                if s.collides_with != s.Collision.collides_fix:                    # and this step not collides with fix
                     if s.deviation:
-                        free_step_to_fix_step = s                   # save this step
+                        free_step_to_fix_step = s             # save this step
 
-    fix_step.agent.goal_pos = fix_agent_goal_pos                # update back the goal pos for fix agent
+    fix_step.agent.goal_pos = fix_agent_goal_pos              # update back the goal pos for fix agent
 
     if free_step_to_fix_step:                                 # in case we find free step to fix step
-        time_unit.update = [fix_step, free_step_to_fix_step] # define to update the changes
+        time_unit.update = [fix_step, free_step_to_fix_step]  # define to update the changes
         return True
-    else:                                                    # in case we didnt find free step to fix step
+    else:                                                     # in case we didnt find free step to fix step
         return False
 
-    # 2. לבדוק שבזמן אחורה הצעד הפנוי ריק
-    # אם כן לעדכן צעד זה במסלול של הקבוע, לעדכן לו שהוא צריך לחזור למקום, ולהחזיר את הצעד שפיניתי עבור הרחפן שרצה לעבור שם
-    # אם לא לבדוק האם יש לי עוד שכן פנוי, ואם אין אז לעקוף על הצעד הקבוע הזה, ו
 
 # this method get agent that contain all possible steps, and return the next step, that not collides with another agent.
 # the method return the step with the highest priority
@@ -93,29 +89,18 @@ def get_next_step(agent, time_unit, world):
     steps = get_possible_steps(agent, time_unit, world)     # get all possible steps
 
     for step in steps:
-        if check_free_step(step, time_unit, time_unit.current_steps):             # if this step not collides with current steps
-
-            #if agent.update_change_direction and step.deviation != 0:      # for provide next time to choose step, that make infinity loop.
-                #agent.change_direction.append((time_unit.time + 1, step.coordinate))
-
-            #if (time_unit.time, step.coordinate) in agent.change_direction: # in case this step make infinity loop, countiue
-                #continue
-
-            #if step.step in agent.forbidden_steps:
-                #continue
+        if check_free_step(step, time_unit, time_unit.current_steps):  # if this step not collides with current steps
 
             # in case i take the same step, stay in place. count how many times in the same place
             if step.step == agent.stay_in_place[0]:
                 agent.stay_in_place[1] += 1
-                #if step.step != agent.goal_pos and agent.stay_in_place[1] > 2:
-                    #continue
             else:
                 agent.stay_in_place = [step.step, 1]
 
             # treatment when the step collides with fix step
             if step.collides_with == step.Collision.collides_fix:
                 if not move_fix_step(step, agent, time_unit, world):   # in case we move the fix step, choose this step for this agent
-                    continue                                      # in case we cant move the fix step, choose another step for this agent
+                    continue                                           # in case we cant move the fix step, choose another step for this agent
         else:
             continue
         return step
@@ -199,12 +184,6 @@ def get_path_len(paths):
 
     return len_paths
 
-# this method return the distance between start to goal for each agent
-def get_distance(agents):
-    len_path = {}
-    for agent in agents:
-        len_path[agent] = abs(agent.start_pos[0] - agent.goal_pos[0]) + abs(agent.start_pos[1] - agent.goal_pos[1]) +abs(agent.start_pos[2] - agent.goal_pos[2])
-    return len_path
 
 #this method get dict of path length, and return the max path len
 def get_max_path_len(paths_len):
@@ -240,7 +219,7 @@ def got_to_goal(agents_list, paths, max_path_len):
             agents_without_solution.append(agent)
 
         # there agent that didnt arrived to goal yet.
-        if agent.current_step != agent.goal_pos and len(paths[agent.id]) <= len(agents_list) * 2:
+        if agent.current_step != agent.goal_pos and len(paths[agent.id]) <= max_path_len * 2:
             return False, []
 
     return True, agents_without_solution

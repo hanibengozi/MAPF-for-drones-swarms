@@ -1,6 +1,7 @@
 from enum import Enum
 
 
+# this class represent step in the world
 class Step:
 
     class Collision(Enum):
