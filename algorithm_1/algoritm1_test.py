@@ -144,15 +144,15 @@ def run_random_cases(height, width, length, agent_radius, security_distance, num
             list_of_faild.append(i)
 
     # save results for showing on screen
-    result += "For running " + str(num_cases) + "cases\n"
-    result += " The number of cases the algorithm returned paths without collisions: " + str(count) + "\n"
+    result += "For running " + str(num_cases) + " cases\n"
+    result += "The number of cases the algorithm returned paths without collisions: " + str(count) + "\n"
     result += "The number of cases the algorithm returned trajectories with collisions: " + str(count_conflicts) + "\n"
     result += "The number of cases that the algorithm did not find paths: " + str(counter_faild) + "\n"
     result += "The time of run is: " + str(run_time) + " " + str(run_time / num_cases) + "\n"
 
     #------------------printing-----------------------------------------
     #print(paths)
-    print(result)
+    #print(result)
 
     # in case we want to save this paths in jason file
     if save_path:
