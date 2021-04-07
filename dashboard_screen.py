@@ -7,7 +7,7 @@ import test_dashboard as test
 
 def show_test_result(result):
     window = Tk()
-    window.title("run 1000 cases")
+    window.title("run tests")
 
     h = Scrollbar(window, orient=HORIZONTAL)
     h.pack(fill=X, side=BOTTOM, expand=FALSE)
@@ -18,8 +18,9 @@ def show_test_result(result):
     canvas = Canvas(window, bd=0, highlightthickness=0, yscrollcommand=v.set, xscrollcommand=h.set)
     canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
 
-    t = Text(canvas, xscrollcommand=h.set, yscrollcommand=v.set)
+    t = Text(canvas, xscrollcommand=h.set, yscrollcommand=v.set, font = "none 16")
     t.insert(END, result)
+    # t.tag_configure("center", justify='center')
     t.pack(side=LEFT, fill=BOTH, expand=TRUE)
 
     h.config(command=canvas.xview)

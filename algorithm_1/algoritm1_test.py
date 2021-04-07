@@ -143,14 +143,17 @@ def run_random_cases(height, width, length, agent_radius, security_distance, num
             counter_faild += 1
             list_of_faild.append(i)
 
-    # save results for showing on screen
-    result += "For running " + str(num_cases) + " cases\n"
-    result += "The number of cases the algorithm returned paths without collisions: " + str(count) + "\n"
-    result += "The number of cases the algorithm returned trajectories with collisions: " + str(count_conflicts) + "\n"
-    result += "The number of cases that the algorithm did not find paths: " + str(counter_faild) + "\n"
-    result += "The time of run is: " + str(run_time) + " " + str(run_time / num_cases) + "\n"
+        # save results for showing on screen
+        result += "=" * 20 + " Test Resulsts " + "=" * 20 + "\n\n"
+        result += "The results of running " + str(num_cases) + " cases using algorithm 1:\n"
+        result += "The number of cases the algorithm returned paths without collisions: " + str(count) + "\n"
+        result += "The number of cases the algorithm returned trajectories with collisions: " + str(count_conflicts) + "\n"
+        result += "The number of cases that the algorithm did not find paths: " + str(counter_faild) + "\n"
+        result += "The total run time is: " + str(run_time) + "\n"
+        result += "The avarage runtime of each case is: " + str(run_time / num_cases) + "\n"
+        result += "\n" + "=" * (40 + len("Test Resulst"))
 
-    #------------------printing-----------------------------------------
+            #------------------printing-----------------------------------------
     #print(paths)
     #print(result)
 
