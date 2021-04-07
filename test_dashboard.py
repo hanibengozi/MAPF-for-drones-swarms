@@ -38,6 +38,3 @@ def show_num_cases(num_cases, num_agents, algorithm):
 
     if algorithm == ALGORITHM_2:
         return run_algorithm_2(num_floors, num_cols, num_rows, num_cases, num_agents)
-
-if __name__ == '__main__':
-    show_num_cases(1, 50, "algorithm 1")

@@ -152,7 +152,7 @@ def run_random_cases(height, width, length, agent_radius, security_distance, num
 
     #------------------printing-----------------------------------------
     #print(paths)
-    print(result)
+    #print(result)
 
     # in case we want to save this paths in jason file
     if save_path:

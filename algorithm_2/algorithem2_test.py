@@ -13,9 +13,9 @@ def run_random_cases(num_floors, num_rows, num_cols, num_cases, num_agents):
     run_time = 0
 
     for i in range(num_cases):
+        graph_manager = find_path.GraphManager((num_rows, num_cols, num_floors))
         path_manager = find_path.PathManager(graph_manager)
         agent_manager = find_path.AgentManager(path_manager)
-        graph_manager = find_path.GraphManager((num_rows, num_cols, num_floors))
         agents_pos = agent_manager.get_random_agents(num_agents)
         
 
@@ -24,7 +24,7 @@ def run_random_cases(num_floors, num_rows, num_cols, num_cases, num_agents):
         run_time = time.time() - start_time
 
         if path_list and check_path(path_list):
-            if not find_path.check_collision(path_list, path_manager.points_manager):
+            if not find_path.TestManager.check_collision(find_path.TestManager,path_list, path_manager.points_manager):
                 count += 1
             else:
                 count_conflicts += 1
@@ -32,14 +32,15 @@ def run_random_cases(num_floors, num_rows, num_cols, num_cases, num_agents):
             counter_faild += 1
 
     # save results for showing on screen
-    result += "For running " + num_cases + "cases\n"
-    result += " The number of cases the algorithm returned paths without collisions: " + count + "\n"
-    result += "The number of cases the algorithm returned trajectories with collisions: " + count_conflicts + "\n"
-    result += "The number of cases that the algorithm did not find paths: " + counter_faild + "\n"
-    result += "The time of run is: ", + run_time + " " + run_time / num_cases
+    result += "For running " + str(num_cases) + " cases\n"
+    result += "The number of cases the algorithm returned paths without collisions: " + str(count) + "\n"
+    result += "The number of cases the algorithm returned trajectories with collisions: " + str(count_conflicts) + "\n"
+    result += "The number of cases that the algorithm did not find paths: " + str(counter_faild) + "\n"
+    result += "The time of run is: " + str(run_time) + "  " + str(run_time / num_cases)
 
     # ------------------printing-----------------------------------------
     #print(result)
+    #print(path_list)
 
     return result
 
