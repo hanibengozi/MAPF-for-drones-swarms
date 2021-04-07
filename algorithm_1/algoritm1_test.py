@@ -115,6 +115,11 @@ def path_equalize(agents, paths, max_pathlen = -1):
         paths[agent] = path
     return paths
 
+def convert_path_to_list(paths):
+
+    sorted(paths)
+
+
 # this method get number od casses and agents and size of world, and run the algorithm number of cases for random position
 def run_random_cases(height, width, length, agent_radius, security_distance, num_cases, num_agents, save_path=0):
 

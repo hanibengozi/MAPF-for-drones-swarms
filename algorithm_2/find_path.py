@@ -720,7 +720,7 @@ class TestManager:
         total_deviation = 0
         total_collision = 0
         case_success_move = 0
-        graph_manager = GraphManager((16, 16, 15))
+        graph_manager = GraphManager((23, 23, 23))
         for j in range(0, cases_num):
             # print("j:", j)
             path_manager = PathManager(graph_manager)
@@ -748,10 +748,10 @@ class TestManager:
         print("case_success_move:", case_success_move)
 
 
-#test_manager = TestManager()
+test_manager = TestManager()
 # test_manager.run_maze()
 # test_manager.run_maze_2()
 # test_manager.run_maze_3()
 # test_manager.run_maze_4()
-#test_manager.run_cases(50, 100)
+test_manager.run_cases(100, 100)
 # run_cases(200, 1)

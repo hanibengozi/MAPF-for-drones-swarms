@@ -83,5 +83,6 @@ def convert_agents_pos(agents_pos):
 def check_path(paths):
     for path in paths:
         if not path:
+            print("the agent that did not find path is: ",paths.index(path))
             return False
     return True
