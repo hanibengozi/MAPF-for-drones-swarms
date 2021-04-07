@@ -42,7 +42,11 @@ def run_tests_btn():
     num_cases = int(root.num_of_cases_entry.get())
     num_agents = int(root.num_of_drones_entry.get())
     alg = root.tkvarq.get()
-    test.run_algorithm_1(100, 100, 100, 0.25, 2, num_cases, num_agents, alg)
+    if alg == "algorithm 1":
+        result = test.run_algorithm_1(100, 100, 100, 0.25, 2, num_cases, num_agents)
+    else:
+        result = test.run_algorithm_2(100, 100, 100, num_cases, num_agents)
+    print(result)
     return
 def run_tests():
     root.run_tests_win = tk.Toplevel(root)
@@ -70,14 +74,16 @@ def run_tests():
     choose_algo_lbl.grid(column=0, row=3, padx=20, pady=5)
 
     options = ["algorithm 1", "algorithm 2"]
-    tkvarq = StringVar(root.run_tests_win)
-    tkvarq.set(options[0])
-    choose_algo = OptionMenu(root.run_tests_win, tkvarq, *options)
+    root.tkvarq = StringVar(root.run_tests_win)
+    root.tkvarq.set(options[0])
+    choose_algo = ttk.OptionMenu(root.run_tests_win, root.tkvarq, *options)
     choose_algo.grid(column=1, row=3, padx=20, pady=5)
 
      # choose file button
     run_btn = tk.Button(root.run_tests_win, text="run tests",command=run_tests_btn)
     run_btn.grid(column=0, row=6, padx=20, pady=10)
+
+
 
 
 

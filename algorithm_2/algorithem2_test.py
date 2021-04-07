@@ -13,11 +13,11 @@ def run_random_cases(num_floors, num_rows, num_cols, num_cases, num_agents):
     run_time = 0
 
     for i in range(num_cases):
-
-        graph_manager = find_path.GraphManager((num_rows, num_cols, num_floors))
-        agents_pos = agent_manager.get_random_agents(num_agents)
         path_manager = find_path.PathManager(graph_manager)
         agent_manager = find_path.AgentManager(path_manager)
+        graph_manager = find_path.GraphManager((num_rows, num_cols, num_floors))
+        agents_pos = agent_manager.get_random_agents(num_agents)
+        
 
         agent_manager.create_agents(agents_pos)
         path_list = agent_manager.get_agents_path_list()
