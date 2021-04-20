@@ -14,6 +14,7 @@ import algorithm_1.search as search
 import json
 import os
 from tkinter import filedialog as fd
+from global_variable import *
 
 # Consts and globals:
 GRAPH_TEXT = "Graph of results will be shown here"
@@ -234,7 +235,7 @@ def calc_paths():
     del_lab_label()
 
     # --------- real date received from user ----------------
-    world = World(100, 100, 100, 0.25, 4)
+    world = World(HEIGHT, WIDTH, LENGTH, AGENT_RADIUS, SECURITY_DISTANCE)
     world.add_agents(input_data)  # add the agents to world
     agents = world.get_agents()
     paths, agents_without_solution = search.path_finding(agents, world)  # get the paths for the agents

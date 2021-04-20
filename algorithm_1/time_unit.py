@@ -14,7 +14,8 @@ class TimeUnit:
 
     # this method add current step to the current step list
     def add_current_step(self, current_step):
-        if current_step not in self.current_steps:   # in case we add the same step for drone, d`ont add twice
+        # in case we add the same step for drone, d`ont add twice
+        if current_step not in self.current_steps:
             self.current_steps.append(current_step)
 
     # this method add prev step to the prev step list

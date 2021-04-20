@@ -5,6 +5,7 @@ import time
 from algorithm_1.world import *
 import json
 start_time = time.time()
+from global_variable import *
 
 
 #generates random start and gaol positions for each agent.
@@ -99,6 +100,7 @@ def get_max_pathlen(paths):
     for agent in paths:
         if len(paths[agent]) > max_path_len:
             max_path_len = len(paths[agent])
+
     return max_path_len
 
 # the method get list of agents and their paths, and make all of the paths in the same length, by duplicate the last step
@@ -114,6 +116,13 @@ def path_equalize(agents, paths, max_pathlen = -1):
             path.append( (last_step[0], last_step[1], last_step[2] ) )
         paths[agent] = path
     return paths
+
+# this method get paths and return true in case all the agents arrived to goal
+def all_arrive_to_goal(paths, agents):
+    for agent in agents:
+        if paths[agent.id][-1] != agent.goal_pos:
+            return False
+    return True
 
 def convert_path_to_list(paths):
 
@@ -132,14 +141,14 @@ def run_random_cases(height, width, length, agent_radius, security_distance, num
 
     for i in range(num_cases):
 
-        world = World(height, width, length, agent_radius, security_distance)
+        world = World(HEIGHT, WIDTH, LENGTH, AGENT_RADIUS, SECURITY_DISTANCE)
         agents_pos = random_inputs(world.num_floors, world.num_rows, world.num_cols, num_agents)
         world.add_agents(agents_pos)                # add the agents to world
         agents = world.get_agents()
         paths, agents_without_solution = search.path_finding(agents, world)  # get the paths for the agents
         run_time = time.time() - start_time
 
-        if paths and not agents_without_solution:
+        if paths and not agents_without_solution and all_arrive_to_goal(paths, agents):
             if not check_conflicts(agents, paths):
                 count += 1
             else:
@@ -148,20 +157,16 @@ def run_random_cases(height, width, length, agent_radius, security_distance, num
             counter_faild += 1
             list_of_faild.append(i)
 
-        # save results for showing on screen
-        result += "=" * 20 + " Test Resulsts " + "=" * 20 + "\n\n"
-        result += "The results of running " + str(num_cases) + " cases using algorithm 1:\n"
-        result += "The number of cases the algorithm returned paths without collisions: " + str(count) + "\n"
-        result += "The number of cases the algorithm returned trajectories with collisions: " + str(count_conflicts) + "\n"
-        result += "The number of cases that the algorithm did not find paths: " + str(counter_faild) + "\n"
-        result += "The total run time is: " + str(run_time) + "\n"
-        result += "The avarage runtime of each case is: " + str(run_time / num_cases) + "\n"
-        result += "\n" + "=" * (40 + len("Test Resulst"))
+    # save results for showing on screen
+    result += "For running " + str(num_cases) + " cases\n"
+    result += "The number of cases the algorithm returned paths without collisions: " + str(count) + "\n"
+    result += "The number of cases the algorithm returned trajectories with collisions: " + str(count_conflicts) + "\n"
+    result += "The number of cases that the algorithm did not find paths: " + str(counter_faild) + "\n"
+    result += "The time of run is: " + str(run_time) + " " + str(run_time / num_cases) + "\n"
 
-            #------------------printing-----------------------------------------
+    #------------------printing-----------------------------------------
     #print(paths)
     #print(result)
-    print(run_time)
 
     # in case we want to save this paths in jason file
     if save_path:
@@ -173,13 +178,16 @@ def run_random_cases(height, width, length, agent_radius, security_distance, num
 def run_specific_case(height, width, length, agent_radius, security_distance, agents_pos, save_path=0):
 
     result = ""
-    world = World(height, width, length, agent_radius, security_distance)
+    world = World(HEIGHT, WIDTH, LENGTH, AGENT_RADIUS, SECURITY_DISTANCE)
     world.add_agents(agents_pos)                                         # add the agents to world
     agents = world.get_agents()
     paths, agents_without_solution = search.path_finding(agents, world)  # get the paths for the agents
     result += "this run time of this case is: " + time.time() - start_time
     print("--- %s seconds ---" % (time.time() - start_time))
     if paths and not agents_without_solution:
+        if not all_arrive_to_goal(paths, agents):
+            result += "failed! not all agent arrive to goal" + "\n"
+            print("failed! not all agent arrive to goal")
         if not check_conflicts(agents, paths):
             result += "This case success!" + "\n"
             print("this case succeeded")
@@ -202,7 +210,7 @@ def run_specific_case(height, width, length, agent_radius, security_distance, ag
 
 def run_one_case(height, width, length, agent_radius, security_distance, agents_pos, save_path=0):
 
-    world = World(height, width, length, agent_radius, security_distance)
+    world = World(HEIGHT, WIDTH, LENGTH, AGENT_RADIUS, SECURITY_DISTANCE)
     world.add_agents(agents_pos)                                          # add the agents to world
     agents = world.get_agents()
     paths, agents_without_solution = search.path_finding(agents, world)   # get the paths for the agents
@@ -210,4 +218,7 @@ def run_one_case(height, width, length, agent_radius, security_distance, agents_
 
 
 if __name__ == '__main__':
-    print(run_random_cases(100, 100, 100, 0.25, 4, 1000, 1))
+    run_random_cases(100, 100, 100, 0.25, 4, 1000, 100)
+
+    #agents_pos = [(9, 9, 13, 8, 9, 15), (10, 10, 18, 8, 9, 18), (10, 10, 19, 8, 9, 20), (12, 12, 19, 11, 11, 21), (13, 12, 19, 12, 11, 20), (14, 13, 20, 15, 13, 20), (7, 8, 17, 5, 7, 16), (9, 9, 20, 7, 8, 20), (10, 10, 20, 8, 9, 21), (11, 11, 20, 10, 10, 19), (12, 11, 20, 10, 10, 21), (13, 12, 20, 14, 13, 20), (14, 13, 18, 15, 14, 18), (8, 9, 14, 5, 7, 14), (7, 8, 20, 5, 7, 19), (7, 8, 18, 5, 7, 20), (12, 11, 18, 12, 11, 19), (11, 11, 16, 13, 12, 16), (11, 11, 14, 12, 11, 16), (14, 13, 16, 15, 14, 16), (10, 10, 13, 10, 10, 14), (9, 10, 12, 7, 8, 12), (11, 11, 11, 11, 11, 14), (11, 11, 14, 10, 10, 15), (11, 11, 13, 12, 11, 15), (14, 13, 17, 15, 14, 17), (13, 13, 14, 15, 14, 15), (8, 8, 16, 5, 7, 15), (9, 9, 19, 8, 9, 17), (9, 10, 18, 8, 9, 16), (10, 10, 12, 8, 9, 14), (11, 11, 18, 12, 11, 18), (12, 12, 18, 13, 12, 18), (13, 12, 13, 15, 13, 14), (10, 10, 17, 10, 10, 17), (11, 11, 16, 11, 11, 17), (11, 11, 15, 12, 11, 17), (11, 11, 12, 14, 13, 14), (12, 11, 17, 13, 12, 17), (12, 12, 12, 13, 12, 15)]
+    #print(run_specific_case(100,100,100,0.25,4,agents_pos))

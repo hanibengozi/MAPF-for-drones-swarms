@@ -1,15 +1,8 @@
 import math
 import test_dashboard
 import algorithm_2.algorithem2_test as test_2
+from global_variable import *
 
-HEIGHT = 100
-WIDTH = 100
-LENGTH = 100
-AGENT_RADIUS = 0.25
-SECURITY_DISTANCE = 4
-num_floors = math.ceil(HEIGHT / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
-num_rows = math.ceil(LENGTH / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
-num_cols = math.ceil(WIDTH / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
 
 def convert_input(agents_start_pos, agents_goal_pos, height, length, width, dron_radius, security_distance):
     start_pos_list = []
@@ -117,7 +110,7 @@ print("converted agents pos: \n", agents_pos)
 # print(convert_output(paths_1, agents_start_pos, agents_goal_pos, 100, 100, 100, 0.25, 4))
 
 # get the paths from algorithm 2
-paths_list_2 = test_dashboard.run_algorithm_2_with_specific_example(num_floors, num_cols, num_rows, agents_pos.copy())
+paths_list_2 = test_dashboard.run_algorithm_2_with_specific_example(NUM_FLOORS, NUM_COLS, NUM_ROWS, agents_pos.copy())
 print(paths_list_2)
 paths_2 = test_2.convert_paths(paths_list_2)
 print(convert_output(paths_2, agents_start_pos, agents_goal_pos, 100, 100, 100, 0.25, 4))

@@ -6,18 +6,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 import math
+from global_variable import *
 
-HEIGHT = 100
-WIDTH = 100
-LENGTH = 100
-AGENT_RADIUS = 0.25
-SECURITY_DISTANCE = 4
-num_floors = math.ceil(HEIGHT / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
-num_rows = math.ceil(LENGTH / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
-num_cols = math.ceil(WIDTH / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
-ALGORITHM_1 = 1
-ALGORITHM_2 = 2
-NUM_CASES = 1
+NUM_CASES = 100
 
 print(num_floors)
 
@@ -28,7 +19,7 @@ def compare_run_time(agents_pos):
     run_time_1 = time.time() - start_time
 
     start_time = time.time()
-    path_2 = test_2.run_one_case(num_floors, num_rows, num_cols, agents_pos.copy())
+    path_2 = test_2.run_one_case(NUM_FLOORS, NUM_ROWS, NUM_COLS, agents_pos.copy())
     run_time_2 = time.time() - start_time
 
     return run_time_1, run_time_2
@@ -90,26 +81,32 @@ def compare_2_algorithm(paths_1, broblem_cases, paths_2):
     else:
         print("algorithm 1 did not find path for this case")
 
+def get_average_pathlen(paths):
+
+    paths_len = [len(paths[agent]) for agent in paths]
+    return sum(paths_len) / len(paths_len)
 
 def main():
-    run_time_1 = run_time_2 = 0
-    success_1 = success_2 = 0
-    max_path_len_1 = max_path_len_2 = 0
+
     run_time_y1 = []
     run_time_y2 = []
     max_path_len_1_list = []
     max_path_len_2_list = []
-    x = [ i for i in range(50, 101, 10)]
+    x = [ i for i in range(300, 309, 10)]
+
     for num_of_agents in x:
-        run_time_1 = run_time_2 = 0
-        success_1 = success_2 = 0
-        max_path_len_1 = max_path_len_2 = 0
+        run_time_1 = 0
+        run_time_2 = 0
+        success_1 = 0
+        success_2 = 0
+        max_path_len_1 = 0
+        max_path_len_2 = 0
 
         for i in range(NUM_CASES):
-            agents_pos = test_1.random_inputs(num_floors, num_cols, num_rows, num_of_agents)
+            agents_pos = test_1.random_inputs(NUM_FLOORS, NUM_COLS, NUM_ROWS, num_of_agents)
             # find the paths for the agents pos, from each algorithm
             path_1, broblem_drones = test_1.run_one_case(HEIGHT, WIDTH, LENGTH, AGENT_RADIUS,SECURITY_DISTANCE, agents_pos.copy())
-            path_2 = test_2.run_one_case(num_floors, num_rows, num_cols, agents_pos.copy())
+            path_2 = test_2.run_one_case(NUM_FLOORS, NUM_ROWS, NUM_COLS, agents_pos.copy())
 
             if path_1 and not broblem_drones:
                 success_1 += 1
@@ -118,10 +115,10 @@ def main():
             if test_2.check_path(path_2):
                 success_2 += 1
                 path_2_dict = test_2.convert_paths(path_2)
-                #print(path_2_dict)
                 max_path_len_2 += test_1.get_max_pathlen(path_2_dict)
             else:
                 print("in this agent pos their are problem in algorithm 2\n", agents_pos)
+                print(path_2)
 
             # find time run of each algorithm for this cases
             time_1, time_2 = compare_run_time(agents_pos)
@@ -130,13 +127,13 @@ def main():
 
 
         if success_1 != NUM_CASES:
-            print("algorithem 1 dont foundt paths for all caccess")
+            print("algorithm 1 dont found paths for all cases")
         if success_2 != NUM_CASES:
-            print("algorithem 2 dont foundt paths for all caccess")
+            print("algorithm 2 dont found paths for all cases")
 
 
-        run_time_y1.append(run_time_1)
-        run_time_y2.append(run_time_2)
+        run_time_y1.append(run_time_1 / NUM_CASES)
+        run_time_y2.append(run_time_2 / NUM_CASES)
         # find what is the average max path len of each algorithm
         max_path_len_1_list.append(max_path_len_1 / NUM_CASES)
         max_path_len_2_list.append(max_path_len_2 / NUM_CASES)

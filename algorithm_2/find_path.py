@@ -728,6 +728,9 @@ class TestManager:
             before_time = datetime.now()
             # print("before_time:", before_time)
             path_list = self.run_case(agent_manager, drones_count)
+            for path in path_list:
+                if not path:
+                    print("kaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
             total_collision += self.check_collision(path_list, path_manager.points_manager)
             total_deviation += self.check_path_deviation(agent_manager.agents)
             after_time = datetime.now()
@@ -738,6 +741,7 @@ class TestManager:
             case_success_move += agent_manager.success_move
             case_error += agent_manager.path_error_counter
             case_move_error += agent_manager.cannot_move_fixed_error_counter
+
 
         print("------------all cases--------------------")
         print("average total_deviation:", total_deviation / cases_num)
@@ -753,5 +757,6 @@ class TestManager:
 # test_manager.run_maze_2()
 # test_manager.run_maze_3()
 # test_manager.run_maze_4()
-#test_manager.run_cases(100, 100)
+# for i in range(10, 101, 10):
+#     test_manager.run_cases(i, 100)
 # run_cases(200, 1)

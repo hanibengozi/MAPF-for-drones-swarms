@@ -1,17 +1,7 @@
 import algorithm_1.algoritm1_test as test_1
 import algorithm_2.algorithem2_test as test_2
 import math
-
-HEIGHT = 100
-WIDTH = 100
-LENGTH = 100
-AGENT_RADIUS = 0.25
-SECURITY_DISTANCE = 4
-num_floors = math.ceil(HEIGHT / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
-num_rows = math.ceil(LENGTH / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
-num_cols = math.ceil(WIDTH / (AGENT_RADIUS * 2 + SECURITY_DISTANCE))
-ALGORITHM_1 = "algorithm 1"
-ALGORITHM_2 = "algorithm 2"
+from global_variable import *
 
 # this method run num cases, num agents and get the result from algorithm 1
 def run_algorithm_1(height, width, length, agent_radius, security_distance, num_cases, num_agents, save_path=0):
@@ -37,4 +27,7 @@ def show_num_cases(num_cases, num_agents, algorithm):
         return run_algorithm_1(HEIGHT, WIDTH, LENGTH, AGENT_RADIUS, SECURITY_DISTANCE, num_cases, num_agents)
 
     if algorithm == ALGORITHM_2:
-        return run_algorithm_2(num_floors, num_cols, num_rows, num_cases, num_agents)
+        return run_algorithm_2(NUM_FLOORS, NUM_COLS, NUM_ROWS, num_cases, num_agents)
+
+if __name__ == '__main__':
+    show_num_cases(1, 300, "algorithm 2")

@@ -70,19 +70,24 @@ def convert_paths(paths_list):
             paths[agent_id + 1].append((step[1], step[2], step[3]))
     return paths
 
+def f(agents_pos):
+    posss = []
+    for pos in agents_pos:
+        posss.append((pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z))
+    return posss
 
 # convert the agents random position to fit for algorithm 2
 def convert_agents_pos(agents_pos):
     random_points = []
     for agent_pos in agents_pos:
         start_pos = Point3D(agent_pos[0], agent_pos[1], agent_pos[2])
-        goal_pos = Point3D(agent_pos[2], agent_pos[3], agent_pos[4])
+        goal_pos = Point3D(agent_pos[3], agent_pos[4], agent_pos[5])
         random_points.append([start_pos, goal_pos])
     return random_points
 
 def check_path(paths):
     for path in paths:
         if not path:
-            print("the agent that did not find path is: ",paths.index(path))
+            print("the agent that did not find path is: ",paths.index(path), path)
             return False
     return True

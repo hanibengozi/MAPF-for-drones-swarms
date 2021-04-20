@@ -101,10 +101,10 @@ def path_finding(agents, world):
             else:                                                                 # in case, this agent stuck
                 #print("agent: ", agent.id, " stuckkkkkkkkkkkkk!!!!!!!!!!")
                 return None, None
-        # לבדוק האם צריך למיין לפי מי שנשאר הרבה זמן במקום ולמיין
+
+        # sort the agents according to who stay in the same place longest
         general_functions.sort_agents_by_time_of_stay_in_place(agents)
-        # לשאול את דבורה האם להשאיר במקום זה צריך להיות בעדיפות יותר מאשר סטייה כי אם אין לי אופציות בלי סטייה אז הוא כל הזמן נשאר במקום
-        # לטפל בכל האופציות של להוזיז קבוע וכו
+
         #print("the number of agents that didnt arrived to goal is: ", len(agents) - counter)
         time_unit = TimeUnit(time_unit.time + 1, time_unit)                       # Advances the steps in one
         time_unit.set_prev_steps(current_steps)                                   # update the prev steps for next time
