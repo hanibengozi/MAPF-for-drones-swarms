@@ -161,6 +161,7 @@ def run_random_cases(height, width, length, agent_radius, security_distance, num
             #------------------printing-----------------------------------------
     #print(paths)
     #print(result)
+    print(run_time)
 
     # in case we want to save this paths in jason file
     if save_path:
@@ -209,4 +210,4 @@ def run_one_case(height, width, length, agent_radius, security_distance, agents_
 
 
 if __name__ == '__main__':
-    run_random_cases(100, 100, 100, 0.25, 4, 1000, 100)
+    print(run_random_cases(100, 100, 100, 0.25, 4, 1000, 1))

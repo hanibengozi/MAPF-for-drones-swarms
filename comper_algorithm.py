@@ -19,7 +19,7 @@ ALGORITHM_1 = 1
 ALGORITHM_2 = 2
 NUM_CASES = 1
 
-
+print(num_floors)
 
 def compare_run_time(agents_pos):
 
