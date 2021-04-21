@@ -3,6 +3,17 @@ import test_dashboard
 import algorithm_2.algorithem2_test as test_2
 from global_variable import *
 
+# get starts and goals positions in the json format in the real coordinates:
+# {
+#   'D000': [(-937, -749, 6000)],
+#   'D001': [(-156, -124, 8400)]],
+#    ...
+# }
+# and returns it in the format: [(9, 9, 13, 8, 9, 15), (10, 10, 18, 8, 9, 18)...]
+def find_free_cell(pos_list):
+    print("\n" + str(pos_list) + "\n")
+    pass
+
 
 def convert_input(agents_start_pos, agents_goal_pos, height, length, width, dron_radius, security_distance):
     start_pos_list = []
@@ -11,25 +22,41 @@ def convert_input(agents_start_pos, agents_goal_pos, height, length, width, dron
         start_pos_list.append(agents_start_pos[agent][0])
     for agent in agents_goal_pos:
         goal_pos_list.append(agents_goal_pos[agent][0])
-
     agents_pos = []
+    converted_start_pos_list = []
+    converted_goal_pos_list = []
     for start_pos, goal_pos in zip(start_pos_list, goal_pos_list):
+        # start point
         start_pos = convert_point(start_pos, height, length, width, dron_radius, security_distance, 1)
+        if start_pos not in converted_start_pos_list:
+            converted_start_pos_list.append(start_pos)
+        # tow agents were mapped to the same cell.
+        else:
+            find_free_cell(converted_start_pos_list)
+            print("tow agents were mapped to the same start cell!!!")
+        # goal point
         goal_pos = convert_point(goal_pos, height, length, width, dron_radius, security_distance, 1)
+        if goal_pos not in converted_goal_pos_list:
+            converted_goal_pos_list.append(goal_pos)
+        # tow agents were mapped to the same cell.
+        else:
+            find_free_cell(converted_goal_pos_list)
+            print("tow agents were mapped to the same goal cell!!!")
         agents_pos.append(start_pos + goal_pos)
     return agents_pos
-
+# get one point in the format: (-937, -749, 6000)
+# and returns it in the format: (9, 9, 13)
 def convert_point(point, height, length, width, dron_radius, security_distance, input = 0):
-    convert_point = []
+    converted_point = []
     if input:
-        convert_point.append(convert_coordinate_input(point[0], width, dron_radius, security_distance))
-        convert_point.append(convert_coordinate_input(point[1], length, dron_radius, security_distance))
-        convert_point.append(convert_coordinate_input(point[2], height, dron_radius, security_distance, 1))
+        converted_point.append(convert_coordinate_input(point[0], width, dron_radius, security_distance))
+        converted_point.append(convert_coordinate_input(point[1], length, dron_radius, security_distance))
+        converted_point.append(convert_coordinate_input(point[2], height, dron_radius, security_distance, 1))
     else:
-        convert_point.append(convert_coordinate_output(point[0], width, dron_radius, security_distance))
-        convert_point.append(convert_coordinate_output(point[1], length, dron_radius, security_distance))
-        convert_point.append(convert_coordinate_output(point[2], height, dron_radius, security_distance, 1))
-    return tuple(convert_point)
+        converted_point.append(convert_coordinate_output(point[0], width, dron_radius, security_distance))
+        converted_point.append(convert_coordinate_output(point[1], length, dron_radius, security_distance))
+        converted_point.append(convert_coordinate_output(point[2], height, dron_radius, security_distance, 1))
+    return tuple(converted_point)
 
 def convert_coordinate_input(coordinate, length, dron_radius, security_distance, z_coordinate=0):
     if z_coordinate:
@@ -86,7 +113,6 @@ def add_point_to_path(path, dron_radius, security_distance):
                     step[coordinate] += int(distance/4) * i
                     convert_path.append(tuple(step))
                 convert_path.append(path[index])
-                print("move up")
 
             elif path[index][coordinate] < path[index - 1][coordinate]:
                 convert_path.append(path[index - 1])
@@ -95,7 +121,6 @@ def add_point_to_path(path, dron_radius, security_distance):
                     step[coordinate] -= int(distance / 4) * i
                     convert_path.append(tuple(step))
                 convert_path.append(path[index])
-                print("move up")
 
     return convert_path
 
