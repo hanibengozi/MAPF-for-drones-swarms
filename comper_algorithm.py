@@ -10,7 +10,7 @@ from global_variable import *
 
 NUM_CASES = 100
 
-
+print(num_floors)
 
 def compare_run_time(agents_pos):
 

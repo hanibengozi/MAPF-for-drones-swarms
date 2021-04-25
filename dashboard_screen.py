@@ -2,51 +2,42 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 #from show_paths_step_by_step.Vialization import *
-import test
 import show_paths.Platform as p
 import test_dashboard as test
 
-
-def btn1_handler(root):
-
-    test_results = test.run_1000_cases()
-
+def show_test_result(result):
     window = Tk()
-    window.title("run 1000 cases")
+    window.title("run tests")
 
     h = Scrollbar(window, orient=HORIZONTAL)
     h.pack(fill=X, side=BOTTOM, expand=FALSE)
 
     v = Scrollbar(window, orient=VERTICAL)
-    v.pack(fill = Y, side = RIGHT, expand = FALSE)
+    v.pack(fill=Y, side=RIGHT, expand=FALSE)
 
     canvas = Canvas(window, bd=0, highlightthickness=0, yscrollcommand=v.set, xscrollcommand=h.set)
     canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
 
-    t = Text(canvas, xscrollcommand=h.set, yscrollcommand=v.set)
-    t.insert(END, test_results)
-    t.pack(side = LEFT, fill = BOTH, expand = TRUE)
+    t = Text(canvas, xscrollcommand=h.set, yscrollcommand=v.set, font = "none 16")
+    t.insert(END, result)
+    # t.tag_configure("center", justify='center')
+    t.pack(side=LEFT, fill=BOTH, expand=TRUE)
 
     h.config(command=canvas.xview)
     v.config(command=canvas.yview)
 
     window.mainloop()
     return
-def btn2_handler():
-    test.draw_paths_step_by_step()
-    return
-def btn3_handler():
+def show_paths_3d():
     p.main()
     return
 def run_tests_btn():
     num_cases = int(root.num_of_cases_entry.get())
     num_agents = int(root.num_of_drones_entry.get())
     alg = root.tkvarq.get()
-    if alg == "algorithm 1":
-        result = test.run_algorithm_1(100, 100, 100, 0.25, 2, num_cases, num_agents)
-    else:
-        result = test.run_algorithm_2(100, 100, 100, num_cases, num_agents)
+    result = test.show_num_cases(num_cases, num_agents, alg)
     print(result)
+    show_test_result(result)
     return
 def run_tests():
     root.run_tests_win = tk.Toplevel(root)
@@ -82,6 +73,7 @@ def run_tests():
      # choose file button
     run_btn = tk.Button(root.run_tests_win, text="run tests",command=run_tests_btn)
     run_btn.grid(column=0, row=6, padx=20, pady=10)
+    return
 
 
 
@@ -95,7 +87,7 @@ title = Label(root, text = "\nWelcome to Multy Agent Pathfinding Project\n", fon
 lbl1 = Label(root, text="Run Tests", font = "none 16")
 btn1 = Button(root, text="run", command = run_tests, font = "none 16")
 lbl3 = Label(root, text="Simulate Paths in 3D Graph", font = "none 16")
-btn3 = Button(root, text="run", command=btn3_handler, font = "none 16")
+btn3 = Button(root, text="run", command = show_paths_3d, font = "none 16")
 
 lbl1.pack()
 btn1.pack()
