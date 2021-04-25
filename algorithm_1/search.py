@@ -35,7 +35,7 @@ def path_finding_with_conflicts(agents):
 def get_distance(agents):
     len_path = {}
     for agent in agents:
-        len_path[agent.id] = abs(agent.start_pos[0] - agent.goal_pos[0]) + abs(agent.start_pos[1] - agent.goal_pos[1]) +abs(agent.start_pos[2] - agent.goal_pos[2])
+        len_path[agent] = abs(agent.start_pos[0] - agent.goal_pos[0]) + abs(agent.start_pos[1] - agent.goal_pos[1]) +abs(agent.start_pos[2] - agent.goal_pos[2])
     return len_path
 
 # this method find paths for all agents without conflicts
@@ -49,7 +49,7 @@ def path_finding(agents, world):
 
     # sort the agents according to the length of the paths with conflicts
     # get the distance from start to goal for each agent
-    paths_len_with_conflicts = general_functions.get_distance(agents)
+    paths_len_with_conflicts = get_distance(agents)
     max_path_len = general_functions.get_max_path_len(paths_len_with_conflicts)
     general_functions.sort_agents(agents, paths_len_with_conflicts)
 

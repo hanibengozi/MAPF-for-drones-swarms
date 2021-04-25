@@ -182,7 +182,7 @@ def run_specific_case(height, width, length, agent_radius, security_distance, ag
     world.add_agents(agents_pos)                                         # add the agents to world
     agents = world.get_agents()
     paths, agents_without_solution = search.path_finding(agents, world)  # get the paths for the agents
-    result += "this run time of this case is: " + time.time() - start_time
+    result += "this run time of this case is: " + str(time.time() - start_time)
     print("--- %s seconds ---" % (time.time() - start_time))
     if paths and not agents_without_solution:
         if not all_arrive_to_goal(paths, agents):
@@ -198,7 +198,7 @@ def run_specific_case(height, width, length, agent_radius, security_distance, ag
         result += "The algorithm didnt find paths for this agents_pos!" + "\n"
         print("the algorithem didnt find paths for this agents_pos\n")
 
-    result += "The paths:\n" + paths
+    result += "The paths:\n" + str(paths)
     print(paths)
 
     # in case we want to save this paths to jason file
@@ -206,7 +206,7 @@ def run_specific_case(height, width, length, agent_radius, security_distance, ag
         with open('../jason_paths/paths.txt', 'w') as json_file:
             json.dump(paths, json_file)
 
-    return result
+    return paths
 
 def run_one_case(height, width, length, agent_radius, security_distance, agents_pos, save_path=0):
 
@@ -222,3 +222,6 @@ if __name__ == '__main__':
 
     #agents_pos = [(9, 9, 13, 8, 9, 15), (10, 10, 18, 8, 9, 18), (10, 10, 19, 8, 9, 20), (12, 12, 19, 11, 11, 21), (13, 12, 19, 12, 11, 20), (14, 13, 20, 15, 13, 20), (7, 8, 17, 5, 7, 16), (9, 9, 20, 7, 8, 20), (10, 10, 20, 8, 9, 21), (11, 11, 20, 10, 10, 19), (12, 11, 20, 10, 10, 21), (13, 12, 20, 14, 13, 20), (14, 13, 18, 15, 14, 18), (8, 9, 14, 5, 7, 14), (7, 8, 20, 5, 7, 19), (7, 8, 18, 5, 7, 20), (12, 11, 18, 12, 11, 19), (11, 11, 16, 13, 12, 16), (11, 11, 14, 12, 11, 16), (14, 13, 16, 15, 14, 16), (10, 10, 13, 10, 10, 14), (9, 10, 12, 7, 8, 12), (11, 11, 11, 11, 11, 14), (11, 11, 14, 10, 10, 15), (11, 11, 13, 12, 11, 15), (14, 13, 17, 15, 14, 17), (13, 13, 14, 15, 14, 15), (8, 8, 16, 5, 7, 15), (9, 9, 19, 8, 9, 17), (9, 10, 18, 8, 9, 16), (10, 10, 12, 8, 9, 14), (11, 11, 18, 12, 11, 18), (12, 12, 18, 13, 12, 18), (13, 12, 13, 15, 13, 14), (10, 10, 17, 10, 10, 17), (11, 11, 16, 11, 11, 17), (11, 11, 15, 12, 11, 17), (11, 11, 12, 14, 13, 14), (12, 11, 17, 13, 12, 17), (12, 12, 12, 13, 12, 15)]
     #print(run_specific_case(100,100,100,0.25,4,agents_pos))
+
+    # 24: [(12, 11, 14), (12, 11, 15), (12, 10, 15), (11, 10, 15), (10, 10, 15), (10, 10, 15), (10, 10, 15), (10, 10, 15),
+    #      (10, 10, 15), (10, 10, 15)]

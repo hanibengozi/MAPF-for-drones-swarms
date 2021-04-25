@@ -2,6 +2,7 @@ import math
 import test_dashboard
 import algorithm_2.algorithem2_test as test_2
 from global_variable import *
+from algorithm_1.world import *
 
 
 def convert_input(agents_start_pos, agents_goal_pos, height, length, width, dron_radius, security_distance):
@@ -13,11 +14,80 @@ def convert_input(agents_start_pos, agents_goal_pos, height, length, width, dron
         goal_pos_list.append(agents_goal_pos[agent][0])
 
     agents_pos = []
+    agent = 1
     for start_pos, goal_pos in zip(start_pos_list, goal_pos_list):
-        start_pos = convert_point(start_pos, height, length, width, dron_radius, security_distance, 1)
-        goal_pos = convert_point(goal_pos, height, length, width, dron_radius, security_distance, 1)
-        agents_pos.append(start_pos + goal_pos)
+        start_pos_converted = convert_point(start_pos, height, length, width, dron_radius, security_distance, 1)
+        goal_pos_converted = convert_point(goal_pos, height, length, width, dron_radius, security_distance, 1)
+        start_pos_converted, goal_pos_converted = fix(start_pos_converted, start_pos, goal_pos_converted, goal_pos, agent)
+        agents_pos.append(start_pos_converted + goal_pos_converted)
+        agent += 1
     return agents_pos
+
+def fix(start_pos_converted, start_pos, goal_pos_converted, goal_pos, agent_id):
+
+    # treat with starts position
+    if start_pos_converted not in START_POS:
+        START_POS.append(start_pos_converted)
+    else:
+        start_neighbors = find_neighbors(start_pos_converted)
+        print("this start step have problem: ", start_pos_converted, start_pos, agent_id)
+
+        for start_neighbor in start_neighbors:
+            if start_neighbor not in START_POS:
+                start_pos_converted = start_neighbor
+                START_POS.append(start_pos_converted)
+                PROBLEM_START_AGENTS.append(agent_id)
+                break
+
+    # treat with goals position
+    if goal_pos_converted not in GOAL_POS:
+        GOAL_POS.append(goal_pos_converted)
+    else:
+        goal_neighbors = find_neighbors(goal_pos_converted)
+        print("this goal step have problem: ", goal_pos_converted, goal_pos, agent_id)
+
+        for goal_neighbor in goal_neighbors:
+            if goal_neighbor not in GOAL_POS:
+                goal_pos_converted = goal_neighbor
+                GOAL_POS.append(goal_pos_converted)
+                PROBLEM_GOAL_AGENTS.append(agent_id)
+                break
+
+    return start_pos_converted, goal_pos_converted
+
+def check_duplicate_start(agents_pos):
+    START_POS = []
+    GOAL_POS = []
+    for pos in agents_pos:
+        start_pos = (pos[0], pos[1], pos[2])
+        goal_pos = (pos[3], pos[4], pos[5])
+        if start_pos in START_POS:
+            print("problem in start pos: ", start_pos)
+            return False
+        else:
+            START_POS.append(start_pos)
+
+        if goal_pos in GOAL_POS:
+            print("problem in gaol pos: ", goal_pos)
+            return False
+        else:
+            GOAL_POS.append(goal_pos)
+    return True
+
+# this function get position in world, and return all the neighbors
+def find_neighbors(position):
+    neighbors = []
+    world = World(HEIGHT, WIDTH, LENGTH, AGENT_RADIUS, SECURITY_DISTANCE)
+    for coordinate in range(3):
+        pos = list(position)
+        pos[coordinate] += 1
+        if world.is_valid_pos(tuple(pos)):
+            neighbors.append(tuple(pos))
+        pos = list(position)
+        pos[coordinate] -= 1
+        if world.is_valid_pos(tuple(pos)):
+            neighbors.append(tuple(pos))
+    return neighbors
 
 def convert_point(point, height, length, width, dron_radius, security_distance, input = 0):
     convert_point = []
@@ -56,11 +126,32 @@ def convert_output(paths, agents_start_pos, agents_goal_pos, height, length, wid
             convert_path.append(convert_point(step, height, length, width, dron_radius, security_distance))
         print("before ", convert_path)
         convert_path = add_point_to_path(convert_path, dron_radius, security_distance)
-        convert_path.insert(0, agents_start_pos[agent_id][0])
-        convert_path.append(agents_goal_pos[agent_id][0])
+
         convert_paths[agent_id] = convert_path
         convert_path = []
         i += 1
+
+    # add the start points, first move the problem agents then the others
+    for agent in paths:
+        agent_id = "D" + str("%03d" % (agent - 1))
+        if agent ==24:
+            print("kkkkkkkkkkkkkkkkk", paths[agent], convert_paths[agent_id])
+        if agent in PROBLEM_START_AGENTS:
+            convert_paths[agent_id].insert(0, agents_start_pos[agent_id][0])
+        else:
+            convert_paths[agent_id].insert(0, agents_start_pos[agent_id][0])
+            convert_paths[agent_id].insert(0, agents_start_pos[agent_id][0])
+        if agent ==24:
+            print("kkkkkkkkkkkkkkkkk", paths[agent], convert_paths[agent_id])
+
+    # add the goal points, first move all the agents then move the problem agents
+    for agent in paths:
+        agent_id = "D" + str("%03d" % (agent - 1))
+        if agent not in PROBLEM_GOAL_AGENTS:
+            convert_paths[agent_id].append(agents_goal_pos[agent_id][0])
+        else:
+            convert_paths[agent_id].append(paths[agent][-1])
+            convert_paths[agent_id].append(agents_goal_pos[agent_id][0])
 
     return convert_paths
 
@@ -104,14 +195,23 @@ agents_start_pos = {'D000': [(-937, -749, 6000)], 'D001': [(-156, -124, 8400)], 
 agents_goal_pos = {'D000': [(-1272, -862, 7000)], 'D001': [(-1272, -862, 8500)], 'D002': [(-1272, -862, 9000)], 'D003': [(41, 28, 9726)], 'D004': [(455, 308, 9426)], 'D005':[(1779, 1206, 9000)], 'D006': [(-2317, -1571, 7550)], 'D007': [(-1686, -1143, 9200)], 'D008': [(-1272, -862, 9600)], 'D009': [(-455, -308, 8992)], 'D010':[(-372, -252, 9626)], 'D011': [(1365, 926, 9000)], 'D012': [(2027, 1375, 8500)], 'D013': [(-2317, -1571, 6650)], 'D014': [(-2482, -1683, 8700)], 'D015': [(-2400, -1627, 9200)], 'D016': [(455, 308, 8892)], 'D017': [(1117, 757, 7500)], 'D018': [(455, 308, 7292)], 'D019': [(2027, 1375, 7500)], 'D020': [(-372, -252, 6592)], 'D021': [(-1407, -954, 5800)], 'D022': [(41, 28, 6492)], 'D023': [(-455, -308, 7192)], 'D024': [(455, 308, 6792)], 'D025': [(2027, 1375, 8000)], 'D026': [(2027, 1375, 7000)], 'D027': [(-2317, -1571, 7100)], 'D028': [(-1272, -862, 8000)], 'D029': [(-1272, -862, 7500)], 'D030': [(-1272, -862, 6500)], 'D031': [(455, 308, 8392)], 'D032': [(1117, 757, 8500)], 'D033': [(1779, 1206, 6500)], 'D034': [(-206, -140, 8092)], 'D035': [(206, 140, 8092)], 'D036':[(455, 308, 7792)], 'D037': [(1365, 926, 6500)], 'D038': [(1117, 757, 8000)], 'D039': [(1117, 757, 7000)]}
 agents_pos = convert_input(agents_start_pos, agents_goal_pos, 100, 100, 100, 0.25, 4)
 
+# check the converted pos for not been any duplicates
 print("converted agents pos: \n", agents_pos)
+if check_duplicate_start(agents_pos):
+    print("noooooo duplicates")
+else:
+    print("their are duplicates")
+
 #get the paths form algorithm 1
-# paths_1 = test_dashboard.run_algorithm_1_with_specific_example(100, 100, 100, 0.25, 4, agents_pos.copy())
-# print(convert_output(paths_1, agents_start_pos, agents_goal_pos, 100, 100, 100, 0.25, 4))
+paths_1 = test_dashboard.run_algorithm_1_with_specific_example(100, 100, 100, 0.25, 4, agents_pos.copy())
+print(paths_1)
+print(convert_output(paths_1, agents_start_pos, agents_goal_pos, 100, 100, 100, 0.25, 4))
 
 # get the paths from algorithm 2
-paths_list_2 = test_dashboard.run_algorithm_2_with_specific_example(NUM_FLOORS, NUM_COLS, NUM_ROWS, agents_pos.copy())
-print(paths_list_2)
-paths_2 = test_2.convert_paths(paths_list_2)
-print(convert_output(paths_2, agents_start_pos, agents_goal_pos, 100, 100, 100, 0.25, 4))
+# paths_list_2 = test_dashboard.run_algorithm_2_with_specific_example(NUM_FLOORS, NUM_COLS, NUM_ROWS, agents_pos.copy())
+# print(paths_list_2)
+# paths_2 = test_2.convert_paths(paths_list_2)
+# print(convert_output(paths_2, agents_start_pos, agents_goal_pos, 100, 100, 100, 0.25, 4))
 
+p = (0, 18, 20)
+print(find_neighbors(p))
