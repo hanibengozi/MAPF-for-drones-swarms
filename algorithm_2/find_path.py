@@ -5,7 +5,7 @@ from datetime import datetime
 import math as m
 from copy import deepcopy
 
-
+# this class takes care of everything related to the graph
 class GraphManager:
     def __init__(self, matrix_cube_size):
         self.matrix_cube_size = matrix_cube_size
@@ -143,7 +143,7 @@ class Agent:
     def get_original_path_length(self):
         return self.path_manager.get_original_path_length(self.from_point, self.to_point)
 
-
+# this class takes care of everything related to the drones
 class AgentManager:
     def __init__(self, path_manager):
         self.next_id_counter = 0
@@ -272,6 +272,7 @@ class AgentManager:
             a = Agent(self.next_id_counter, a[0], a[1], self.path_manager)
             self.agents.append(a)
 
+    # This function random positions of skimmers around the world
     def get_random_agents(self, agents_count):
         from_points = set()
         to_points = set()
@@ -295,7 +296,7 @@ class AgentManager:
             agents.append([from_point, to_point])
         return agents
 
-
+# This class finds the paths, and takes care of everything related to the paths
 class PathManager:
     def __init__(self, graph_manager):
         self.points_manager = PointsManager(graph_manager)
@@ -324,6 +325,7 @@ class PathManager:
     def remove_busy(self, points):
         self.points_manager.remove_busy(points)
 
+    # this method get the distance between start point to end point
     def get_original_path_length(self, from_point, to_point):
         return self.graph_manager.get_original_path_length(from_point, to_point)
 
@@ -336,6 +338,7 @@ class PathManager:
             max_time, self.graph_manager.matrix_cube_size[0], self.graph_manager.matrix_cube_size[1],
             self.graph_manager.matrix_cube_size[2])
 
+    # this method find the path for drone
     def get_path(self, from_point, to_point, check_fixed_collision, wait_time, agent_id):
         if from_point == to_point:
             return [(0, from_point.x, from_point.y, from_point.z)]
@@ -346,6 +349,7 @@ class PathManager:
             [PointVertex(None, from_point, (0, from_point.x, from_point.y, from_point.z))])
         path = list()
         time = 0
+        # loop until the stack is empty
         while (len(path_step_stack) > 0):
             vertex_point = path_step_stack.pop()
             time_point = vertex_point.time_point
@@ -357,6 +361,7 @@ class PathManager:
                 if self.points_manager.is_time_unit_busy(time_point):
                     continue
 
+            # in case we got to goal, restore and return the path
             if step == to_point:
 
                 pointer = vertex_point
@@ -369,8 +374,10 @@ class PathManager:
                 path.reverse()
                 return path
 
+            # in case we didnt arrived to goal, save the step in visited list
             visited_points.add(step.to_tuple())
 
+            # get all the neighbors for this step
             steps = self.graph_manager.get_steps_to_destination(
                 step, to_point, can_stay)
 
@@ -380,11 +387,13 @@ class PathManager:
                 if self.points_manager.is_first_point_busy(time + 1, s.to_tuple(), agent_id):
                     continue
 
+                # if this neighbor in visited list continue to the next neighbor
                 if check_fixed_collision:
                     if not can_stay:
                         if s.to_tuple() in visited_points:
                             continue
 
+                    # in case we can choose to stay in place, check that we dont stay in the same place a lot of time
                     if can_stay:
                         if s.to_tuple() in visited_points and not (
                                 s == step and not self.check_wait_time(vertex_point, wait_time)):
@@ -420,7 +429,7 @@ class PathManager:
                 break
         return time == same_point
 
-
+# this class manager the point, and takes care of everything related to the point
 class PointsManager:
     def __init__(self, graph_manager):
         self.graph_manager = graph_manager
@@ -627,7 +636,7 @@ class PointVertex:
         self.point = point
         self.time_point = time_point
 
-
+# this class runs the paths and make tests on them
 class TestManager:
     def __init__(self):
         pass

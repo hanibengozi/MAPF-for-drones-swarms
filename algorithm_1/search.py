@@ -85,7 +85,6 @@ def path_finding(agents, world):
             new_step = general_functions.get_next_step(agent, time_unit, world)   # get next step
 
             if new_step:                                                          # their is next step for this agent
-                #print("this agent: ", agent.id, " find next step in time: ", time_unit.time, " the next step is: ", new_step.step, " is goal: ", new_step.is_goal, agent.stay_in_place)
 
                 update_movment_of_fix(agents, paths, current_steps, time_unit)                   # in case we move fix step, make some updates
                 time_unit.add_current_step(new_step)                              # add this step to current steps
@@ -99,7 +98,6 @@ def path_finding(agents, world):
                     counter += 1
 
             else:                                                                 # in case, this agent stuck
-                #print("agent: ", agent.id, " stuckkkkkkkkkkkkk!!!!!!!!!!")
                 return None, None
 
         # sort the agents according to who stay in the same place longest
@@ -115,6 +113,7 @@ def path_finding(agents, world):
     agents_without_solution = general_functions.got_to_goal(agents, paths, max_path_len)[1]
     return paths, agents_without_solution
 
+# this method take care of movment of fix, Updates everything we need
 def update_movment_of_fix(agents, paths, current_steps, time_unit):
 
     # check if need to make changes

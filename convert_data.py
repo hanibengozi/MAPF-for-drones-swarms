@@ -5,6 +5,7 @@ from global_variable import *
 from algorithm_1.world import *
 
 
+# this method get position and maps them into cube
 def convert_input(agents_start_pos, agents_goal_pos, height, length, width, dron_radius, security_distance):
     start_pos_list = []
     goal_pos_list = []
@@ -55,6 +56,7 @@ def fix(start_pos_converted, start_pos, goal_pos_converted, goal_pos, agent_id):
 
     return start_pos_converted, goal_pos_converted
 
+# this method check if their 2 points that maps to the same cube
 def check_duplicate_start(agents_pos):
     START_POS = []
     GOAL_POS = []
@@ -89,6 +91,7 @@ def find_neighbors(position):
             neighbors.append(tuple(pos))
     return neighbors
 
+# this method get point in world, and return the point in are world
 def convert_point(point, height, length, width, dron_radius, security_distance, input = 0):
     convert_point = []
     if input:
@@ -111,6 +114,7 @@ def convert_coordinate_output(coordinate, length, dron_radius, security_distance
         return int(coordinate * (100 * (dron_radius * 2 + security_distance)) + (100 * (dron_radius * 2 + security_distance)) / 2)
     return int((coordinate * (100 * (dron_radius * 2 + security_distance))) - (length * 100) / 2 + (100 * (dron_radius * 2 + security_distance)) / 2)
 
+# this method get are paths, and return the paths at the request of the company
 def convert_output(paths, agents_start_pos, agents_goal_pos, height, length, width, dron_radius, security_distance):
     convert_path = []
     convert_paths = {}
@@ -155,6 +159,7 @@ def convert_output(paths, agents_start_pos, agents_goal_pos, height, length, wid
 
     return convert_paths
 
+# At each slot crossing we will add 4 points, to match the company’s unit of time
 def add_point_to_path(path, dron_radius, security_distance):
 
     additional_points = []
